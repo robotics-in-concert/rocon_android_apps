@@ -1,4 +1,4 @@
-rocon_android_apps
+ROCON Android apps
 ==================
 
 ROCON-related Android apps storage
