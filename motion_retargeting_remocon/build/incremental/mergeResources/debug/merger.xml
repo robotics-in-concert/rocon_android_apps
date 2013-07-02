@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger>
+
+    <dataSet config="main" >
+        <source path="/opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/src/main/res" >
+            <file
+                path="/opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/src/main/res/values/strings.xml"
+                qualifiers="" >
+                <string name="app_name" >MotionRetargetingRemocon
+                </string>
+            </file>
+            <file
+                name="main"
+                path="/opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/src/main/res/layout/main.xml"
+                qualifiers=""
+                type="layout" />
+        </source>
+        <source path="/opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/build/res/rs/debug" />
+    </dataSet>
+    <dataSet config="debug" >
+        <source path="/opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/src/debug/res" />
+    </dataSet>
+
+</merger>

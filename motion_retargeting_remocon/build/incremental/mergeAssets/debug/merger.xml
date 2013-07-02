@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger>
+
+    <dataSet config="main" >
+        <source path="/opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/src/main/assets" />
+    </dataSet>
+    <dataSet config="debug" >
+        <source path="/opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/src/debug/assets" />
+    </dataSet>
+
+</merger>
