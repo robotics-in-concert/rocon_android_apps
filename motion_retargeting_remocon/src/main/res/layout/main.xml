@@ -4,10 +4,160 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="Hello World, MotionRetargetingRemocon"
-    />
+
+    <LinearLayout
+            android:id="@+id/dashboard"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#00000000"
+            android:orientation="horizontal"
+            android:gravity="right">
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:layout_margin="5dp">
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@android:style/TextAppearance.Large"
+                android:text="@string/tracked_users_text_view"
+                android:id="@+id/textTrackedUser"
+                android:layout_gravity="center_horizontal|top"
+                />
+
+        <org.ros.android.view.RosTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAppearance="@android:style/TextAppearance.Large"
+                android:text="@string/tracked_user_placeholder"
+                android:id="@+id/textViewTrackedUser"
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_horizontal"/>
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:orientation="horizontal">
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/user_chooser_text_view"
+                android:id="@+id/textView3"
+                android:layout_weight="0"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="5dp"
+                android:gravity="center_vertical|left"/>
+
+        <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/editTextNewUser"
+                android:text="@string/user_chooser_placeholder"
+                android:hint="@string/user_chooser_hint"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_weight="0.5"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"/>
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="@string/user_chooser_button_text"
+                android:id="@+id/buttonSetUser"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp">
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/available_users_text_view"
+                android:id="@+id/textView"/>
+
+        <org.ros.android.view.RosTextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/available_users_placeholder"
+                android:id="@+id/textViewAvailableUsers"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_marginLeft="10dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="40dp"
+            android:baselineAligned="false">
+
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:gravity="center_horizontal">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/text_view_motion_control"
+                    android:id="@+id/textView2"
+                    />
+
+            <ToggleButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/toggleButtonMotionControl"
+                    android:text="hey"
+                    android:checked="true"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:gravity="center_horizontal">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/text_view_motion_recording"
+                    android:id="@+id/textView4"
+                    />
+
+            <ToggleButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/toggleButtonMotionRecording"
+                    android:checked="false"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
 </LinearLayout>
 

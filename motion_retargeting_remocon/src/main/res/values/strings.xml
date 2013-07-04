@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MotionRetargetingRemocon</string>
+    <string name="app_label">MotionRetargetingRemote</string>
+    <string name="node_name">motion_retargeting_remocon</string>
+    <string name="default_robot_name">robot</string>
+    <string name="paired_app_name">rocon_android_apps/motion_retargeting</string>
+    <string name="stop_app">Stop App</string>
+    <string name="available_users_topic_name">openni_tracker/available_users</string>
+    <string name="available_users_placeholder">none</string>
+    <string name="available_users_text_view">Available Users (IDs)</string>
+    <string name="tracked_user_topic_name">openni_tracker/tracked_user</string>
+    <string name="tracked_user_placeholder">none</string>
+    <string name="tracked_users_text_view">Tracked User</string>
+    <string name="user_chooser_topic_name">openni_tracker/user_chooser</string>
+    <string name="user_chooser_placeholder">1</string>
+    <string name="user_chooser_text_view">New User</string>
+    <string name="user_chooser_hint">Enter User ID</string>
+    <string name="user_chooser_button_text">Set User</string>
+    <string name="motion_control_topic_name">motion_retargeting_controller/motion_control</string>
+    <string name="motion_recording_topic_name">motion_retargeting_controller/motion_recording</string>
+    <string name="text_view_motion_control">Motion Control</string>
+    <string name="text_view_motion_recording">Motion Recording</string>
 </resources>

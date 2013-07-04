@@ -1,9 +1,0 @@
-# incremental data. DO NOT EDIT.
-# format is <lastModified> <length> <SHA-1> <path>
-# Encoding is UTF-8
-1372726449000 729 4b6719f41bfb4bb2615f166170a2475e1c83ecc4 /opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/build/classes/debug/com/github/robotics_in_concert/rocon_android_apps/motion_retargeting_remocon/R.class
-1372726449000 461 13864dedc96315a8359d3d274bfa756af0a807fa /opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/build/classes/debug/com/github/robotics_in_concert/rocon_android_apps/motion_retargeting_remocon/BuildConfig.class
-1372726449000 568 790dae06b9f5ee0baddfe6fdab07201e4df2d197 /opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/build/classes/debug/com/github/robotics_in_concert/rocon_android_apps/motion_retargeting_remocon/R$layout.class
-1372726449000 669 940fa07af6a036548502cdf2a930476f3fca50ee /opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/build/classes/debug/com/github/robotics_in_concert/rocon_android_apps/motion_retargeting_remocon/MotionRetargetingRemocon.class
-1372726449000 572 15c2eabcdd1e31c7bc3af63f7a5e22176c9ae1af /opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/build/classes/debug/com/github/robotics_in_concert/rocon_android_apps/motion_retargeting_remocon/R$string.class
-1372726449000 514 494698e55cbb24e87e256613ed4b88baed40d739 /opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/build/classes/debug/com/github/robotics_in_concert/rocon_android_apps/motion_retargeting_remocon/R$attr.class

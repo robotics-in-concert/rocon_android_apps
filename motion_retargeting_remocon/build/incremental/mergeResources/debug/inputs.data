@@ -1,5 +1,0 @@
-# incremental data. DO NOT EDIT.
-# format is <lastModified> <length> <SHA-1> <path>
-# Encoding is UTF-8
-1372726396000 407 3a193412ecdbfb475411ca6d0a10f62ac59f7adb /opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/src/main/res/layout/main.xml
-1372726396000 126 ade28358576c5d98cfe9ca013c96ed2752503d85 /opt/android_workspace/ros_android/src/rocon_android_apps/motion_retargeting_remocon/src/main/res/values/strings.xml
