@@ -9,6 +9,8 @@ project(rocon_android_apps)
 # Catkin
 ##############################################################################
 
-find_package(catkin REQUIRED rosjava_tools)
+find_package(catkin REQUIRED rosjava_build_tools)
 catkin_android_setup()
 catkin_package()
+
+
