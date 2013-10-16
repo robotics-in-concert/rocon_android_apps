@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_view"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/top_view"
+        android:layout_width="fill_parent"
+        android:layout_height="50dip"
+        android:background="#ff404040"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="50dip"
+            android:onClick="back"
+            android:text="Back" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:id="@+id/save_button" />
+
+        <Button
+            android:id="@+id/choose_map_button"
+            android:layout_width="wrap_content"
+            android:layout_height="50dip"
+            android:onClick="chooserMap"
+            android:text="Change map" />
+
+        <RadioGroup
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal"
+            android:paddingLeft="30dp"
+            android:gravity="center_vertical"
+            android:baselineAligned="false"
+            android:focusable="false">
+
+            <RadioButton
+                android:id="@+id/add_ar_marker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="addMarkerClicked"
+                android:checked="true"
+                android:text="Add AR marker" />
+
+            <RadioButton
+                android:id="@+id/add_column"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="addColumnClicked"
+                android:text="Add column"
+                android:layout_marginLeft="10dp"
+                android:checked="false" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add wall"
+                android:id="@+id/add_wall"
+                android:layout_marginLeft="10dp"
+                android:onClick="addWallClicked" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add table"
+                android:id="@+id/add_table"
+                android:layout_marginLeft="10dp"
+                android:onClick="addTableClicked" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add pickup point"
+                android:id="@+id/add_pickup_point"
+                android:layout_marginLeft="10dp"
+                android:onClick="addPickupClicked" />
+
+            <LinearLayout
+                android:id="@+id/top_bar"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#ff404040"
+                android:gravity="right"
+                android:orientation="horizontal" >
+            </LinearLayout>
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/main_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal" >
+
+        <org.ros.android.view.visualization.VisualizationView
+            android:id="@+id/map_view"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight=".25" />
+
+        <LinearLayout
+            android:id="@+id/side_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight=".75"
+            android:gravity="right"
+            android:orientation="vertical" >
+
+            <ExpandableListView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/annotations_view" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

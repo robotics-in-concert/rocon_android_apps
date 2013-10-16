@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Marcus Liebhardt
+ * Copyright (C) 2013 Yujin Robot.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,10 +13,19 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+dependencies {
+  compile 'com.github.rosjava.android_apps:application_management:0.1.+'
+  compile 'org.ros.android_core:android_honeycomb_mr2:0.1.+'
+  compile 'org.ros.rosjava_core:rosjava_geometry:0.1.+'
+  compile 'org.ros.rosjava_messages:map_store:0.3.+'
+  compile 'org.ros.rosjava_messages:move_base_msgs:1.11.+'
+  compile 'org.ros.rosjava_messages:yocs_msgs:0.5.+'
+    //TODO need virt. sensor msgs here
+}
 
-/* Uncomment these and add your own packages to be gradled
-include 'my_android_project'
-include 'my_android_library_project'
-*/
-include 'motion_retargeting_remocon'
-include 'map_annotation'
+apply plugin: 'android'
+
+android {
+    compileSdkVersion 13
+}
+
