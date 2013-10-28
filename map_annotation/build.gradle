@@ -20,7 +20,6 @@ dependencies {
   compile 'org.ros.rosjava_messages:map_store:0.3.+'
   compile 'org.ros.rosjava_messages:move_base_msgs:1.11.+'
   compile 'org.ros.rosjava_messages:yocs_msgs:0.5.+'
-    //TODO need virt. sensor msgs here
 }
 
 apply plugin: 'android'
