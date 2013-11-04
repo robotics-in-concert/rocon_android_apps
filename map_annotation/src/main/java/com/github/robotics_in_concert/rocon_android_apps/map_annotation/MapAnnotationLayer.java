@@ -118,7 +118,7 @@ public class MapAnnotationLayer extends DefaultLayer {
                 pose = Transform.translation(poseVector).multiply(Transform.zRotation(angle));
 
                 annotation.setTransform(pose);
-                annotation.setWidth(dist);
+                annotation.setWidth((float)dist);
                 return true;
             }
             if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -207,7 +207,7 @@ public class MapAnnotationLayer extends DefaultLayer {
                     if (name.getText().length() == 0)
                         throw new Exception("Annotation name cannot be empty");
                     if (height.getText().length() > 0)
-                        annotation.setHeight(Double.parseDouble(height.getText().toString()));
+                        annotation.setHeight(Float.parseFloat(height.getText().toString()));
 
                     annotation.setName(name.getText().toString());
                     annotationsList.addItem(annotation);

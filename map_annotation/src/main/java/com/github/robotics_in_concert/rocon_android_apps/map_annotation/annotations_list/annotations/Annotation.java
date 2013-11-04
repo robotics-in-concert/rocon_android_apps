@@ -7,8 +7,8 @@ import org.ros.android.view.visualization.shape.TriangleFanShape;
 public abstract class Annotation extends TriangleFanShape {
     protected String name;
     protected String group;
-    protected double width;
-    protected double height;
+    protected float  width;
+    protected float  height;
 
     public String getGroup() {
         return group;
@@ -31,19 +31,19 @@ public abstract class Annotation extends TriangleFanShape {
         this.name = name;
     }
 
-    public double getWidth() {
+    public float getWidth() {
         return width;
     }
 
-    public void setWidth(double width) {
+    public void setWidth(float width) {
         this.width = width;
     }
 
-    public double getHeight() {
+    public float getHeight() {
         return height;
     }
 
-    public void setHeight(double height) {
+    public void setHeight(float height) {
         this.height = height;
     }
 }

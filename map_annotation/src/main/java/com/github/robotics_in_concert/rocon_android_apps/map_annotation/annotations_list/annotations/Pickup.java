@@ -4,7 +4,7 @@ import org.ros.android.view.visualization.Color;
 
 public class Pickup extends Annotation {
     private static final Color COLOR = Color.fromHexAndAlpha("FDB813", 0.8f);
-    private static final float VERTICES[] = starVertices(5, 0.25f, 0.5f, 0.0f, 0.0f);
+    private static final float VERTICES[] = starVertices(5, 0.224f, 0.5f, 0.0f, 0.0f);
 
     public Pickup(String name) {
         super(name, VERTICES, COLOR);

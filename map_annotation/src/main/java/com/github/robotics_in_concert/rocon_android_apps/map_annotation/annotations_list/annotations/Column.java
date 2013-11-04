@@ -2,9 +2,13 @@ package com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotat
 
 import org.ros.android.view.visualization.Color;
 
+import javax.microedition.khronos.opengles.GL10;
+
 public class Column extends Annotation {
+    private static final float MINIMUM_WIDTH  = 0.1f;
+    private static final float MINIMUM_HEIGHT = 1.0f;
     private static final Color COLOR = Color.fromHexAndAlpha("E6E4D8", 0.8f);
-    private static final float VERTICES[] = circleVertices(30, 0.1f, 0.0f, 0.0f);
+    private static final float VERTICES[] = circleVertices(30, MINIMUM_WIDTH, 0.0f, 0.0f);
 
     private static float[] circleVertices(int vertexCount, float radius,
                                           float center_x, float center_y) {
@@ -39,12 +43,14 @@ public class Column extends Annotation {
     public Column(String name) {
         super(name, VERTICES, COLOR);
         setGroup("Virtual Columns");
+
+        width  = MINIMUM_WIDTH;
+        height = MINIMUM_HEIGHT;
     }
 
     @Override
-    public void setWidth(double width) {
-        super.setWidth(width);
-
-        setVertices(circleVertices(30, (float)width/2.0f, 0.0f, 0.0f));
+    protected void scale(GL10 gl) {
+        // The scale is in metric space, so we can directly use shape's size.
+        gl.glScalef(width/MINIMUM_WIDTH, width/MINIMUM_WIDTH, 1.0f);
     }
 }
