@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.ExpandableListAdapter;
@@ -32,7 +33,6 @@ import org.ros.rosjava_geometry.Vector3;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import geometry_msgs.PoseStamped;
 
 public class MapAnnotationLayer extends DefaultLayer {
 
@@ -171,13 +171,9 @@ public class MapAnnotationLayer extends DefaultLayer {
                                 }
                                 annotation.setTransform(Transform.translation(
                                         camera.toMetricCoordinates((int) e.getX(), (int) e.getY())));
-                       //         Log.e("@@@@@@@@@@", camera.transform.toString());
 
-//                                camera.setFrame(MAP_FRAME);
                                 fixedPose = Transform.translation(camera.toMetricCoordinates(
                                         (int) e.getX(), (int) e.getY()));
-//                                camera.setFrame(ROBOT_FRAME);
-
                             }
                         });
             }
@@ -195,8 +191,18 @@ public class MapAnnotationLayer extends DefaultLayer {
         alertDialogBuilder.setView(promptView);
 
         final boolean annotationAccepted = false;
-        final EditText name = (EditText) promptView.findViewById(R.id.name);
-        final EditText height = (EditText) promptView.findViewById(R.id.height);
+        final EditText name_edit    = (EditText) promptView.findViewById(R.id.name_edit);
+        final EditText height_edit  = (EditText) promptView.findViewById(R.id.height_edit);
+        final TextView name_label   = (TextView) promptView.findViewById(R.id.name_label);
+        final TextView height_label = (TextView) promptView.findViewById(R.id.height_label);
+
+        // Customize for some slightly exotic annotations
+        if (mode == Mode.ADD_MARKER)                // Marker name must be its id, a positive integer
+            name_edit.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        if (mode == Mode.ADD_PICKUP) {
+            height_edit.setVisibility(View.GONE);   // Pickup points
+            height_label.setVisibility(View.GONE);  // have no height
+        }
 
         // setup a dialog window
         alertDialogBuilder.setCancelable(false);
@@ -204,12 +210,12 @@ public class MapAnnotationLayer extends DefaultLayer {
             public void onClick(DialogInterface dialog, int id) {
                 // get user input and set it to result
                 try {
-                    if (name.getText().length() == 0)
+                    if (name_edit.getText().length() == 0)
                         throw new Exception("Annotation name cannot be empty");
-                    if (height.getText().length() > 0)
-                        annotation.setHeight(Float.parseFloat(height.getText().toString()));
+                    if (height_edit.getText().length() > 0)
+                        annotation.setHeight(Float.parseFloat(height_edit.getText().toString()));
 
-                    annotation.setName(name.getText().toString());
+                    annotation.setName(name_edit.getText().toString());
                     annotationsList.addItem(annotation);
                 } catch (NumberFormatException e) {
                     Toast.makeText(context, "Height must be a number; discarding...", Toast.LENGTH_LONG).show();
@@ -236,10 +242,10 @@ public class MapAnnotationLayer extends DefaultLayer {
 
                 setEnabled(false);
 
-        name.addTextChangedListener(new TextWatcher() {
+        name_edit.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
                 alertDlg.getButton(AlertDialog.BUTTON_POSITIVE)
-                        .setEnabled(name.getText().length() > 0);
+                        .setEnabled(name_edit.getText().length() > 0);
             }
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
