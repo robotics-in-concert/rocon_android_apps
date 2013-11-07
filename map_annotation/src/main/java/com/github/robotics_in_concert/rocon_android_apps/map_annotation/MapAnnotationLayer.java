@@ -24,7 +24,6 @@ import org.ros.android.view.visualization.VisualizationView;
 import org.ros.android.view.visualization.layer.DefaultLayer;
 import org.ros.android.view.visualization.shape.GoalShape;
 import org.ros.android.view.visualization.shape.PoseShape;
-import org.ros.namespace.NameResolver;
 import org.ros.node.ConnectedNode;
 import org.ros.node.Node;
 import org.ros.rosjava_geometry.FrameTransformTree;
@@ -40,7 +39,6 @@ public class MapAnnotationLayer extends DefaultLayer {
 
     private final Context context;
     private Annotation annotation;
-    private NameResolver nameResolver;
     private GestureDetector gestureDetector;
     private Transform pose;
     private Transform fixedPose;
@@ -56,9 +54,7 @@ public class MapAnnotationLayer extends DefaultLayer {
         ADD_MARKER, ADD_TABLE, ADD_COLUMN, ADD_WALL, ADD_PICKUP
     }
 
-    public MapAnnotationLayer(NameResolver newNameResolver, Context context,
-                              ExpandableListAdapter annotationsList) {
-        this.nameResolver = newNameResolver;
+    public MapAnnotationLayer(Context context, ExpandableListAdapter annotationsList) {
         this.context = context;
         this.annotationsList = annotationsList;
     }
@@ -238,9 +234,7 @@ public class MapAnnotationLayer extends DefaultLayer {
         alertDlg.show();
 
         // ensure that both fields contain something before enabling OK
-        alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).
-
-                setEnabled(false);
+        alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
 
         name_edit.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {

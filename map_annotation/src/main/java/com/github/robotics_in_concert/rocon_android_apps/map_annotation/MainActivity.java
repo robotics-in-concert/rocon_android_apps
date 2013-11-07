@@ -48,7 +48,7 @@ import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotati
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Pickup;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Table;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Wall;
-import com.github.rosjava.android_apps.application_management.RosAppActivity;
+import com.github.rosjava.android_apps.application_management.ConcertAppActivity;
 import org.ros.namespace.NameResolver;
 import org.ros.node.NodeConfiguration;
 import org.ros.node.NodeMainExecutor;
@@ -63,7 +63,7 @@ import org.ros.time.NtpTimeProvider;
 /**
  * @author murase@jsk.imi.i.u-tokyo.ac.jp (Kazuto Murase)
  */
-public class MainActivity extends RosAppActivity {
+public class MainActivity extends ConcertAppActivity {
 
 	private static final String MAP_FRAME = "map";
 	private static final String ROBOT_FRAME = "base_link";
@@ -196,8 +196,9 @@ public class MainActivity extends RosAppActivity {
         });
 
 		mapView.addLayer(viewControlLayer);
-		mapView.addLayer(new OccupancyGridLayer(appNameSpace.resolve(mapTopic).toString()));
-        annotationLayer = new MapAnnotationLayer(appNameSpace, this, annotationsList);
+//        String kk = appNameSpace.resolve(mapTopic).toString();
+		mapView.addLayer(new OccupancyGridLayer(mapTopic));
+        annotationLayer = new MapAnnotationLayer(this, annotationsList);
 		mapView.addLayer(annotationLayer);
 		NtpTimeProvider ntpTimeProvider = new NtpTimeProvider(
 				InetAddressFactory.newFromHostString("192.168.0.1"),

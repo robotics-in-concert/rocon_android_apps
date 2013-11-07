@@ -36,7 +36,8 @@ public class MapManager extends AbstractNodeMain {
 
     public void setNameResolver(NameResolver newNameResolver) {
         nameResolver = newNameResolver;
-        nameResolverSet = true;
+        if (nameResolver != null)
+            nameResolverSet = true;
     }
 
     public void setFunction(String function) {
