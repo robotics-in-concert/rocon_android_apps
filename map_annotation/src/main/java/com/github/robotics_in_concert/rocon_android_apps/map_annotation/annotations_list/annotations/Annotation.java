@@ -4,10 +4,15 @@ package com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotat
 import org.ros.android.view.visualization.Color;
 import org.ros.android.view.visualization.shape.TriangleFanShape;
 
+/**
+ * Base class for all annotations to manage properties common to all annotations.
+ * We store just one value for 2D (top view) size; subclasses must provide meaningfull planar dimensions.
+ * However the height is treated similarly in all annotations (though it's meaningless in some cases)
+ */
 public abstract class Annotation extends TriangleFanShape {
     protected String name;
     protected String group;
-    protected float  width;
+    protected float  sizeXY;
     protected float  height;
 
     public String getGroup() {
@@ -31,12 +36,10 @@ public abstract class Annotation extends TriangleFanShape {
         this.name = name;
     }
 
-    public float getWidth() {
-        return width;
-    }
+    public float getSizeXY() { return sizeXY; }
 
-    public void setWidth(float width) {
-        this.width = width;
+    public void setSizeXY(float sizeXY) {
+        this.sizeXY = sizeXY;
     }
 
     public float getHeight() {

@@ -5,10 +5,13 @@ import org.ros.android.view.visualization.Color;
 import javax.microedition.khronos.opengles.GL10;
 
 public class Wall extends Annotation {
-    private static final float MINIMUM_WIDTH  = 0.1f;
-    private static final float MINIMUM_HEIGHT = 1.0f;
+    public static final String GROUP_NAME = "Virtual Walls";
+
+    private static final float MINIMUM_LENGTH = 0.1f;  // Must be above 0 for drawing, but we don't control by now when assigning new with!
+    private static final float DEFAULT_WIDTH  = 0.1f;  // Constant thickness of the wall
+    private static final float DEFAULT_HEIGHT = 1.0f;
     private static final Color COLOR = Color.fromHexAndAlpha("841F27", 0.8f);
-    private static final float VERTICES[] = rectangleVertices(0.1f, MINIMUM_WIDTH, 0.0f, 0.0f);
+    private static final float VERTICES[] = rectangleVertices(DEFAULT_WIDTH, MINIMUM_LENGTH, 0.0f, 0.0f);
 
     private static float[] rectangleVertices(float length, float width,
                                              float center_x, float center_y) {
@@ -36,16 +39,19 @@ public class Wall extends Annotation {
 
     public Wall(String name) {
         super(name, VERTICES, COLOR);
-        setGroup("Virtual Walls");
+        setGroup(GROUP_NAME);
 
-        width  = MINIMUM_WIDTH;
-        height = MINIMUM_HEIGHT;
+        sizeXY = MINIMUM_LENGTH;
+        height = DEFAULT_HEIGHT;
     }
+
+    public float getLength() { return sizeXY; }
+    public float getWidth()  { return DEFAULT_WIDTH; }
 
     @Override
     protected void scale(GL10 gl) {
         // The scale is in metric space, so we can directly use shape's size.
         // Note that we scale only in y (width) dimension; wall's thickness remains constant
-        gl.glScalef(1.0f, width / MINIMUM_WIDTH, 1.0f);
+        gl.glScalef(1.0f, sizeXY / MINIMUM_LENGTH, 1.0f);
     }
 }

@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.R;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.*;
 
-public class ExpandableListAdapter extends BaseExpandableListAdapter {
+public class AnnotationsList extends BaseExpandableListAdapter {
 
     @Override
     public boolean areAllItemsEnabled()
@@ -28,7 +28,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private ArrayList<String>                 groups;
     private ArrayList<ArrayList<Annotation>>  children;
 
-    public ExpandableListAdapter(Context context, ExpandableListView listView) {
+    public AnnotationsList(Context context, ExpandableListView listView) {
         this.context  = context;
         this.listView = listView;
         this.groups   = new ArrayList<String>();
@@ -165,6 +165,21 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int arg0, int arg1) {
         return true;
+    }
+
+    // Extra candy methods
+    public long getGroupId(Annotation annotation) {
+        return getGroupId(groups.indexOf(annotation.getGroup()));
+    }
+
+    public ArrayList<Annotation> getChildren(String groupName) {
+        int index = groups.indexOf(groupName);
+        if (index == -1) {
+            Log.e("MapAnn", "Invalid group name: " + groupName);
+            return null;
+        }
+
+        return (ArrayList<Annotation>)children.get(index);
     }
 
     public ArrayList<Annotation> listFullContent() {

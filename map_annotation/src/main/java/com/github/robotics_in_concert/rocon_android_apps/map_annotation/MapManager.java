@@ -16,6 +16,8 @@ import org.ros.node.ConnectedNode;
 import org.ros.node.service.ServiceClient;
 import org.ros.node.service.ServiceResponseListener;
 
+import java.util.Hashtable;
+
 public class MapManager extends AbstractNodeMain {
 
 	private ConnectedNode connectedNode;
@@ -24,10 +26,16 @@ public class MapManager extends AbstractNodeMain {
 	private ServiceResponseListener<PublishMapResponse> publishServiceResponseListener;
 
 	private String mapId;
+    private String listSrvName = "list_maps";
+    private String pubSrvName  = "publish_map";
     private NameResolver nameResolver;
     private boolean nameResolverSet = false;
 	
-	public MapManager() {
+	public MapManager(final Hashtable<String, String> remaps) {
+        if (remaps.containsKey(listSrvName))
+            listSrvName = remaps.get(listSrvName);
+        if (remaps.containsKey(pubSrvName))
+            pubSrvName = remaps.get(pubSrvName);
 	}
 	
 	public void setMapId(String mapId) {
@@ -58,11 +66,7 @@ public class MapManager extends AbstractNodeMain {
 		ServiceClient<ListMapsRequest, ListMapsResponse> listMapsClient;
 		try
         {
-            String srvName = "list_maps";
-            if (nameResolverSet)
-            {
-                srvName = nameResolver.resolve(srvName).toString();
-            }
+            String srvName = nameResolverSet ? nameResolver.resolve(listSrvName).toString() : listSrvName;
 			listMapsClient = connectedNode.newServiceClient(srvName, ListMaps._TYPE);
 		} catch (ServiceNotFoundException e) {
 		          try {
@@ -83,11 +87,7 @@ public class MapManager extends AbstractNodeMain {
 		
 		try
         {
-            String srvName = "publish_map";
-            if (nameResolverSet)
-            {
-                srvName = nameResolver.resolve(srvName).toString();
-            }
+            String srvName = nameResolverSet ? nameResolver.resolve(pubSrvName).toString() : pubSrvName;
 			publishMapClient = connectedNode.newServiceClient(srvName, PublishMap._TYPE);
 		} catch (ServiceNotFoundException e) {
 			 try {

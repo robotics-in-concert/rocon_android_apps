@@ -6,8 +6,8 @@ import java.util.Random;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.*;
 
 public class MockDataProvider {
-    // A utility method that generates random Vehicles
-    public static Annotation getRandomVehicle(String name) {
+    // A utility method that generates random annotations
+    public static Annotation getRandomAnnotation(String name) {
         Annotation annotation = null;
         Random random = new Random();
         int type = random.nextInt(5);

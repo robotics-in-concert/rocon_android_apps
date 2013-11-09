@@ -3,12 +3,14 @@ package com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotat
 import org.ros.android.view.visualization.Color;
 
 public class Pickup extends Annotation {
+    public static final String GROUP_NAME = "Pickup Points";
+
     private static final Color COLOR = Color.fromHexAndAlpha("FDB813", 0.8f);
     private static final float VERTICES[] = starVertices(5, 0.224f, 0.5f, 0.0f, 0.0f);
 
     public Pickup(String name) {
         super(name, VERTICES, COLOR);
-        setGroup("Pickup Points");
+        setGroup(GROUP_NAME);
     }
 
     private static float[] starVertices(int arms, float radInner, float radOuter,
@@ -43,4 +45,8 @@ public class Pickup extends Annotation {
 
         return buffer;
     }
+
+    // Dimensions are meaningless for a pickup point
+    public float getRadius() { return 0.02f; }
+    public float getHeight() { return 0.02f; }
 }

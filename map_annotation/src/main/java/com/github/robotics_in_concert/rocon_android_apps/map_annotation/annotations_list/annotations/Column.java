@@ -5,10 +5,12 @@ import org.ros.android.view.visualization.Color;
 import javax.microedition.khronos.opengles.GL10;
 
 public class Column extends Annotation {
-    private static final float MINIMUM_WIDTH  = 0.1f;
-    private static final float MINIMUM_HEIGHT = 1.0f;
+    public static final String GROUP_NAME = "Virtual Columns";
+
+    private static final float MINIMUM_RADIUS = 0.1f;
+    private static final float DEFAULT_HEIGHT = 2.0f;
     private static final Color COLOR = Color.fromHexAndAlpha("E6E4D8", 0.8f);
-    private static final float VERTICES[] = circleVertices(30, MINIMUM_WIDTH, 0.0f, 0.0f);
+    private static final float VERTICES[] = circleVertices(30, MINIMUM_RADIUS, 0.0f, 0.0f);
 
     private static float[] circleVertices(int vertexCount, float radius,
                                           float center_x, float center_y) {
@@ -42,15 +44,17 @@ public class Column extends Annotation {
 
     public Column(String name) {
         super(name, VERTICES, COLOR);
-        setGroup("Virtual Columns");
+        setGroup(GROUP_NAME);
 
-        width  = MINIMUM_WIDTH;
-        height = MINIMUM_HEIGHT;
+        sizeXY = MINIMUM_RADIUS;
+        height = DEFAULT_HEIGHT;
     }
+
+    public float getRadius() { return sizeXY; }
 
     @Override
     protected void scale(GL10 gl) {
         // The scale is in metric space, so we can directly use shape's size.
-        gl.glScalef(width/MINIMUM_WIDTH, width/MINIMUM_WIDTH, 1.0f);
+        gl.glScalef(sizeXY / MINIMUM_RADIUS, sizeXY / MINIMUM_RADIUS, 1.0f);
     }
 }

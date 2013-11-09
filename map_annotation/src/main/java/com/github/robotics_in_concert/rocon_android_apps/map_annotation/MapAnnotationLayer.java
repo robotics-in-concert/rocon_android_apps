@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2013 Yujin Robot.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package com.github.robotics_in_concert.rocon_android_apps.map_annotation;
 
 import android.content.Context;
@@ -15,7 +31,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.ExpandableListAdapter;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.AnnotationsList;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.*;
 import com.google.common.base.Preconditions;
 
@@ -32,7 +48,9 @@ import org.ros.rosjava_geometry.Vector3;
 
 import javax.microedition.khronos.opengles.GL10;
 
-
+/**
+ * @author jorge@yujinrobot.com (Jorge Santos Simon)
+ */
 public class MapAnnotationLayer extends DefaultLayer {
 
     private static final String MAP_FRAME = "map";
@@ -44,7 +62,7 @@ public class MapAnnotationLayer extends DefaultLayer {
     private Transform fixedPose;
     private Camera camera;
     private ConnectedNode connectedNode;
-    private ExpandableListAdapter annotationsList;
+    private AnnotationsList annotationsList;
     private Mode mode;
     private PoseShape origin_shape;
     private GoalShape camera_shape;
@@ -54,7 +72,7 @@ public class MapAnnotationLayer extends DefaultLayer {
         ADD_MARKER, ADD_TABLE, ADD_COLUMN, ADD_WALL, ADD_PICKUP
     }
 
-    public MapAnnotationLayer(Context context, ExpandableListAdapter annotationsList) {
+    public MapAnnotationLayer(Context context, AnnotationsList annotationsList) {
         this.context = context;
         this.annotationsList = annotationsList;
     }
@@ -114,7 +132,7 @@ public class MapAnnotationLayer extends DefaultLayer {
                 pose = Transform.translation(poseVector).multiply(Transform.zRotation(angle));
 
                 annotation.setTransform(pose);
-                annotation.setWidth((float)dist);
+                annotation.setSizeXY((float) dist);
                 return true;
             }
             if (event.getAction() == MotionEvent.ACTION_UP) {

@@ -18,7 +18,6 @@ package com.github.robotics_in_concert.rocon_android_apps.map_annotation;
 
 import java.sql.Date;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -35,15 +34,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ExpandableListView;
-import android.widget.Toast;
 
 import map_store.ListMapsResponse;
 import map_store.MapListEntry;
 import map_store.PublishMapResponse;
 
-import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.ExpandableListAdapter;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.AnnotationsList;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.AnnotationsPublisher;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Marker;
-import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Annotation;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Column;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Pickup;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Table;
@@ -61,14 +59,13 @@ import org.ros.exception.RemoteException;
 import org.ros.time.NtpTimeProvider;
 
 /**
- * @author murase@jsk.imi.i.u-tokyo.ac.jp (Kazuto Murase)
+ * @author jorge@yujinrobot.com (Jorge Santos Simon)
  */
 public class MainActivity extends ConcertAppActivity {
 
-	private static final String MAP_FRAME = "map";
-	private static final String ROBOT_FRAME = "base_link";
-    private static final String mapTopic = "map";
-    private static final String scanTopic = "scan";
+	private static final String MAP_FRAME = "map"; // from the map topic???
+//	private static final String ROBOT_FRAME = "dummy_tf";  // ???
+    private static final String DEFAULT_MAP_TOPIC = "map";
 
     private VisualizationView mapView;
 	private ViewGroup mainLayout;
@@ -80,7 +77,8 @@ public class MainActivity extends ConcertAppActivity {
 	private AlertDialog chooseMapDialog;
 	private NodeMainExecutor nodeMainExecutor;
 	private NodeConfiguration nodeConfiguration;
-    private ExpandableListAdapter annotationsList;
+    private AnnotationsList annotationsList;
+    private AnnotationsPublisher annotationsPub;
     private Handler handler = new Handler()
     {
         @Override
@@ -127,7 +125,7 @@ public class MainActivity extends ConcertAppActivity {
 			}
 		});
 
-		mapView.getCamera().jumpToFrame(ROBOT_FRAME);
+		mapView.getCamera().jumpToFrame(MAP_FRAME);
 		mainLayout = (ViewGroup) findViewById(R.id.main_layout);
 		sideLayout = (ViewGroup) findViewById(R.id.side_layout);
 
@@ -153,8 +151,7 @@ public class MainActivity extends ConcertAppActivity {
 //            }
 //        });
 
-        annotationsList = new ExpandableListAdapter(this, listView);
-        listView.setAdapter(annotationsList);
+        annotationsList = new AnnotationsList(this, listView);
 
         // TODO use reflection to take all classes on annotations package except Annotation
         annotationsList.addGroup(new Marker(""));
@@ -162,6 +159,9 @@ public class MainActivity extends ConcertAppActivity {
         annotationsList.addGroup(new Table(""));
         annotationsList.addGroup(new Column(""));
         annotationsList.addGroup(new Wall(""));
+
+        annotationsPub = new AnnotationsPublisher(remaps, annotationsList);
+        listView.setAdapter(annotationsList);
 	}
 
 	@Override
@@ -196,7 +196,9 @@ public class MainActivity extends ConcertAppActivity {
         });
 
 		mapView.addLayer(viewControlLayer);
-//        String kk = appNameSpace.resolve(mapTopic).toString();
+
+        String mapTopic = remaps.containsKey(DEFAULT_MAP_TOPIC) ? remaps.get(DEFAULT_MAP_TOPIC) : DEFAULT_MAP_TOPIC;
+
 		mapView.addLayer(new OccupancyGridLayer(mapTopic));
         annotationLayer = new MapAnnotationLayer(this, annotationsList);
 		mapView.addLayer(annotationLayer);
@@ -206,6 +208,8 @@ public class MainActivity extends ConcertAppActivity {
 		ntpTimeProvider.startPeriodicUpdates(1, TimeUnit.MINUTES);
 		nodeConfiguration.setTimeProvider(ntpTimeProvider);
 		nodeMainExecutor.execute(mapView, nodeConfiguration.setNodeName("android/map_view"));
+
+        nodeMainExecutor.execute(annotationsPub, nodeConfiguration.setNodeName("android/annotations_pub"));
 
 		readAvailableMapList();
 	}
@@ -237,7 +241,7 @@ public class MainActivity extends ConcertAppActivity {
 	private void readAvailableMapList() {
 		safeShowWaitingDialog("Waiting...", "Waiting for map list");
 
-		MapManager mapManager = new MapManager();
+		MapManager mapManager = new MapManager(remaps);
         mapManager.setNameResolver(getAppNameSpace());
 		mapManager.setFunction("list");
 		safeShowWaitingDialog("Waiting...", "Waiting for map list");
@@ -302,7 +306,7 @@ public class MainActivity extends ConcertAppActivity {
 
 	private void loadMap(MapListEntry mapListEntry) {
 
-		MapManager mapManager = new MapManager();
+		MapManager mapManager = new MapManager(remaps);
         mapManager.setNameResolver(getAppNameSpace());
 		mapManager.setFunction("publish");
 		mapManager.setMapId(mapListEntry.getMapId());
@@ -314,8 +318,7 @@ public class MainActivity extends ConcertAppActivity {
 						@Override
 						public void onSuccess(PublishMapResponse message) {
 							Log.i("MapAnn", "loadMap() Success");
-							safeDismissWaitingDialog();
-							// poseSetter.enable();
+                            safeDismissWaitingDialog();
 						}
 
 						@Override
