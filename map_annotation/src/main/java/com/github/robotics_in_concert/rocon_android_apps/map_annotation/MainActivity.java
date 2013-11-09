@@ -35,9 +35,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 
-import map_store.ListMapsResponse;
 import map_store.MapListEntry;
+import map_store.ListMapsResponse;
 import map_store.PublishMapResponse;
+import annotations_store.SaveAnnotationsResponse;
 
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.AnnotationsList;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.AnnotationsPublisher;
@@ -47,9 +48,13 @@ import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotati
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Table;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Wall;
 import com.github.rosjava.android_apps.application_management.ConcertAppActivity;
+
+import org.ros.exception.RosRuntimeException;
+import org.ros.exception.ServiceNotFoundException;
 import org.ros.namespace.NameResolver;
 import org.ros.node.NodeConfiguration;
 import org.ros.node.NodeMainExecutor;
+import org.ros.node.service.ServiceClient;
 import org.ros.node.service.ServiceResponseListener;
 import org.ros.address.InetAddressFactory;
 import org.ros.android.view.visualization.VisualizationView;
@@ -79,6 +84,8 @@ public class MainActivity extends ConcertAppActivity {
 	private NodeConfiguration nodeConfiguration;
     private AnnotationsList annotationsList;
     private AnnotationsPublisher annotationsPub;
+
+    private MapListEntry currentMap;
     private Handler handler = new Handler()
     {
         @Override
@@ -241,11 +248,11 @@ public class MainActivity extends ConcertAppActivity {
 	private void readAvailableMapList() {
 		safeShowWaitingDialog("Waiting...", "Waiting for map list");
 
-		MapManager mapManager = new MapManager(remaps);
-        mapManager.setNameResolver(getAppNameSpace());
-		mapManager.setFunction("list");
+		DatabaseManager databaseManager = new DatabaseManager(remaps);
+        databaseManager.setNameResolver(getAppNameSpace());
+		databaseManager.setFunction("list");
 		safeShowWaitingDialog("Waiting...", "Waiting for map list");
-		mapManager.setListService(new ServiceResponseListener<ListMapsResponse>() {
+		databaseManager.setListService(new ServiceResponseListener<ListMapsResponse>() {
 					@Override
 					public void onSuccess(ListMapsResponse message) {
 						Log.i("MapAnn", "readAvailableMapList() Success");
@@ -260,7 +267,7 @@ public class MainActivity extends ConcertAppActivity {
 					}
 				});
 
-		nodeMainExecutor.execute(mapManager,
+		nodeMainExecutor.execute(databaseManager,
 				nodeConfiguration.setNodeName("android/list_maps"));
 	}
 
@@ -287,15 +294,14 @@ public class MainActivity extends ConcertAppActivity {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				AlertDialog.Builder builder = new AlertDialog.Builder(
-						MainActivity.this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 				builder.setTitle("Choose a map");
 				builder.setItems(availableMapNames,
 						new DialogInterface.OnClickListener() {
 							@Override
-							public void onClick(DialogInterface dialog,
-									int itemIndex) {
-								loadMap(list.get(itemIndex));
+							public void onClick(DialogInterface dialog, int itemIndex) {
+                                currentMap = list.get(itemIndex);
+								loadMap(currentMap);
 							}
 						});
 				chooseMapDialog = builder.create();
@@ -306,14 +312,14 @@ public class MainActivity extends ConcertAppActivity {
 
 	private void loadMap(MapListEntry mapListEntry) {
 
-		MapManager mapManager = new MapManager(remaps);
-        mapManager.setNameResolver(getAppNameSpace());
-		mapManager.setFunction("publish");
-		mapManager.setMapId(mapListEntry.getMapId());
+		DatabaseManager databaseManager = new DatabaseManager(remaps);
+        databaseManager.setNameResolver(getAppNameSpace());
+		databaseManager.setFunction("publish");
+		databaseManager.setMapId(mapListEntry.getMapId());
 
 		safeShowWaitingDialog("Waiting...", "Loading map");
 		try {
-			mapManager
+			databaseManager
 					.setPublishService(new ServiceResponseListener<PublishMapResponse>() {
 						@Override
 						public void onSuccess(PublishMapResponse message) {
@@ -331,9 +337,38 @@ public class MainActivity extends ConcertAppActivity {
 			Log.e("MapAnn", "loadMap() caught exception.", ex);
 			safeDismissWaitingDialog();
 		}
-		nodeMainExecutor.execute(mapManager,
+		nodeMainExecutor.execute(databaseManager,
 				nodeConfiguration.setNodeName("android/publish_map"));
 	}
+
+    public void saveAnnotations(View view) {
+        DatabaseManager databaseManager = new DatabaseManager(remaps);
+        databaseManager.setNameResolver(getAppNameSpace());
+        databaseManager.setFunction("save");
+        databaseManager.setMap(currentMap);
+
+        safeShowWaitingDialog("Waiting...", "Saving annotations");
+        try {
+            databaseManager.setSaveService(new ServiceResponseListener<SaveAnnotationsResponse>() {
+                        @Override
+                        public void onSuccess(SaveAnnotationsResponse message) {
+                            Log.i("MapAnn", "Save annotations success");
+                            safeDismissWaitingDialog();
+                        }
+
+                        @Override
+                        public void onFailure(RemoteException e) {
+                            Log.i("MapAnn", "Save annotations failure");
+                            safeDismissWaitingDialog();
+                        }
+                    });
+        } catch (Throwable ex) {
+            Log.e("MapAnn", "Save annotations caught exception.", ex);
+            safeDismissWaitingDialog();
+        }
+        nodeMainExecutor.execute(databaseManager,
+                nodeConfiguration.setNodeName("android/save_annotations"));
+    }
 
 	private void safeDismissChooseMapDialog() {
 		runOnUiThread(new Runnable() {

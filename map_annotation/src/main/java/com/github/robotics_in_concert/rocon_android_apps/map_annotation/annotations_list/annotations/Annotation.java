@@ -6,7 +6,7 @@ import org.ros.android.view.visualization.shape.TriangleFanShape;
 
 /**
  * Base class for all annotations to manage properties common to all annotations.
- * We store just one value for 2D (top view) size; subclasses must provide meaningfull planar dimensions.
+ * We store just one value for 2D (top view) size; subclasses must provide meaningful planar dimensions.
  * However the height is treated similarly in all annotations (though it's meaningless in some cases)
  */
 public abstract class Annotation extends TriangleFanShape {
