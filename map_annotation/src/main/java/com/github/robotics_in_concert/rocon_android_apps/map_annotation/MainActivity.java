@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 OSRF.
+ * Copyright (C) 2013 Yujin Robot.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -18,6 +18,7 @@ package com.github.robotics_in_concert.rocon_android_apps.map_annotation;
 
 import java.sql.Date;
 import java.text.DateFormat;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -48,6 +49,7 @@ import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotati
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Table;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Wall;
 import com.github.rosjava.android_apps.application_management.ConcertAppActivity;
+import com.github.rosjava.android_apps.application_management.ConcertDescription;
 
 import org.ros.exception.RosRuntimeException;
 import org.ros.exception.ServiceNotFoundException;
@@ -68,8 +70,7 @@ import org.ros.time.NtpTimeProvider;
  */
 public class MainActivity extends ConcertAppActivity {
 
-	private static final String MAP_FRAME = "map"; // from the map topic???
-//	private static final String ROBOT_FRAME = "dummy_tf";  // ???
+	private static final String DEFAULT_MAP_FRAME = "/map"; // can take from the map topic? TODO
     private static final String DEFAULT_MAP_TOPIC = "map";
 
     private VisualizationView mapView;
@@ -84,9 +85,8 @@ public class MainActivity extends ConcertAppActivity {
 	private NodeConfiguration nodeConfiguration;
     private AnnotationsList annotationsList;
     private AnnotationsPublisher annotationsPub;
-
     private MapListEntry currentMap;
-    private Handler handler = new Handler()
+    private Handler handler = new Handler()  // TODO useless
     {
         @Override
         public void handleMessage(Message msg)
@@ -132,7 +132,7 @@ public class MainActivity extends ConcertAppActivity {
 			}
 		});
 
-		mapView.getCamera().jumpToFrame(MAP_FRAME);
+//		mapView.getCamera().jumpToFrame(DEFAULT_MAP_FRAME);
 		mainLayout = (ViewGroup) findViewById(R.id.main_layout);
 		sideLayout = (ViewGroup) findViewById(R.id.side_layout);
 
@@ -167,7 +167,7 @@ public class MainActivity extends ConcertAppActivity {
         annotationsList.addGroup(new Column(""));
         annotationsList.addGroup(new Wall(""));
 
-        annotationsPub = new AnnotationsPublisher(remaps, annotationsList);
+        annotationsPub = new AnnotationsPublisher(params, remaps, annotationsList);
         listView.setAdapter(annotationsList);
 	}
 
@@ -207,7 +207,7 @@ public class MainActivity extends ConcertAppActivity {
         String mapTopic = remaps.containsKey(DEFAULT_MAP_TOPIC) ? remaps.get(DEFAULT_MAP_TOPIC) : DEFAULT_MAP_TOPIC;
 
 		mapView.addLayer(new OccupancyGridLayer(mapTopic));
-        annotationLayer = new MapAnnotationLayer(this, annotationsList);
+        annotationLayer = new MapAnnotationLayer(this, annotationsList, params);
 		mapView.addLayer(annotationLayer);
 		NtpTimeProvider ntpTimeProvider = new NtpTimeProvider(
 				InetAddressFactory.newFromHostString("192.168.0.1"),

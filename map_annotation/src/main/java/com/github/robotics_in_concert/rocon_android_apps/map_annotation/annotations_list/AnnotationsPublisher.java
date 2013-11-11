@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2013 Yujin Robot.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list;
 
 import android.database.DataSetObserver;
@@ -13,14 +29,17 @@ import org.ros.node.ConnectedNode;
 import org.ros.node.Node;
 import org.ros.node.NodeMain;
 import org.ros.node.topic.Publisher;
+import org.ros.rosjava_geometry.Quaternion;
+import org.ros.rosjava_geometry.Transform;
+import org.ros.rosjava_geometry.Vector3;
 
 import ar_track_alvar.AlvarMarker;
 import ar_track_alvar.AlvarMarkers;
 
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 /**
- * Created by jorge on 11/6/13.
+ * @author jorge@yujinrobot.com (Jorge Santos Simon)
  *
  * Publishes current annotations every time the information on the annotations list changes.
  */
@@ -29,7 +48,7 @@ public class AnnotationsPublisher extends DataSetObserver implements NodeMain {
 
     private AnnotationsList annotationsList;
 
-    private String mapFrame = "/map";  // TODO this should come from the map description, or parameters list, or at least from a common place in the app
+    private String mapFrame = "/map";  // TODO take from map description instead of being a parameter
 
     private String markersTopic = "markers";
     private String tablesTopic  = "tables";
@@ -47,7 +66,10 @@ public class AnnotationsPublisher extends DataSetObserver implements NodeMain {
 
     private boolean initialized = false;
 
-    public AnnotationsPublisher(final Hashtable<String, String> remaps, AnnotationsList list) {
+    public AnnotationsPublisher(final LinkedHashMap<String, Object> params,
+                                final LinkedHashMap<String, String> remaps, AnnotationsList list) {
+        if (params.containsKey("map_frame")) mapFrame = (String)params.get("map_frame");
+
         if (remaps.containsKey(markersTopic)) markersTopic = remaps.get(markersTopic);
         if (remaps.containsKey(tablesTopic))  tablesTopic  = remaps.get(tablesTopic);
         if (remaps.containsKey(columnsTopic)) columnsTopic = remaps.get(columnsTopic);
@@ -71,15 +93,18 @@ public class AnnotationsPublisher extends DataSetObserver implements NodeMain {
         yocs_msgs.ColumnList columnsMsg = columnsPub.newMessage();
         yocs_msgs.WallList   wallsMsg   = wallsPub.newMessage();
 
+        Transform makeVertical = new Transform(new Vector3(0.0, 0.0, 0.0), new Quaternion(0.5, 0.5, 0.5, 0.5));
+
         for (Annotation ann: annotationsList.listFullContent()) {
             if (ann.getGroup().equals(Marker.GROUP_NAME)) {
                 AlvarMarker annMsg = messageFactory.newFromType(AlvarMarker._TYPE);
-                annMsg.setId(((Marker)ann).getId());
+                annMsg.setId(((Marker) ann).getId());
                 annMsg.getPose().getHeader().setFrameId(mapFrame);
-                ann.getTransform().toPoseMessage(annMsg.getPose().getPose());  // TODO  needs rotate!!!
+                Transform tf = ann.getTransform().multiply(makeVertical);
+                tf.toPoseMessage(annMsg.getPose().getPose());
                 markersMsg.getMarkers().add(annMsg);
             }
-            if (ann.getGroup().equals(Column.GROUP_NAME)) {
+            else if (ann.getGroup().equals(Column.GROUP_NAME)) {
                 Column column = (Column)ann;
                 yocs_msgs.Column annMsg = messageFactory.newFromType(yocs_msgs.Column._TYPE);
                 annMsg.setName(column.getName());
@@ -89,7 +114,7 @@ public class AnnotationsPublisher extends DataSetObserver implements NodeMain {
                 column.getTransform().toPoseMessage(annMsg.getPose().getPose().getPose());
                 columnsMsg.getObstacles().add(annMsg);
             }
-            if (ann.getGroup().equals(Wall.GROUP_NAME)) {
+            else if (ann.getGroup().equals(Wall.GROUP_NAME)) {
                 Wall wall = (Wall)ann;
                 yocs_msgs.Wall annMsg = messageFactory.newFromType(yocs_msgs.Wall._TYPE);
                 annMsg.setName(wall.getName());
@@ -100,7 +125,7 @@ public class AnnotationsPublisher extends DataSetObserver implements NodeMain {
                 wall.getTransform().toPoseMessage(annMsg.getPose().getPose().getPose());
                 wallsMsg.getObstacles().add(annMsg);
             }
-            if (ann.getGroup().equals(Table.GROUP_NAME)) {
+            else if (ann.getGroup().equals(Table.GROUP_NAME)) {
                 Table table = (Table)ann;
                 yocs_msgs.Table annMsg = messageFactory.newFromType(yocs_msgs.Table._TYPE);
                 annMsg.setName(table.getName());
@@ -110,7 +135,7 @@ public class AnnotationsPublisher extends DataSetObserver implements NodeMain {
                 table.getTransform().toPoseMessage(annMsg.getPose().getPose().getPose());
                 tablesMsg.getTables().add(annMsg);
             }
-            if (ann.getGroup().equals(Pickup.GROUP_NAME)) {
+            else if (ann.getGroup().equals(Pickup.GROUP_NAME)) {
                 // Pickup; as legacy from our first demo, pickup points are tables; mmm.... sucks! TODO
                 Pickup pickup = (Pickup)ann;
                 yocs_msgs.Table annMsg = messageFactory.newFromType(yocs_msgs.Table._TYPE);
@@ -120,6 +145,9 @@ public class AnnotationsPublisher extends DataSetObserver implements NodeMain {
                 annMsg.getPose().getHeader().setFrameId(mapFrame);
                 pickup.getTransform().toPoseMessage(annMsg.getPose().getPose().getPose());
                 tablesMsg.getTables().add(annMsg);
+            }
+            else {
+                Log.w("MapAnn", "Unrecognized group name: " + ann.getGroup());
             }
         }
 

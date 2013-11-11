@@ -46,14 +46,18 @@ import org.ros.rosjava_geometry.FrameTransformTree;
 import org.ros.rosjava_geometry.Transform;
 import org.ros.rosjava_geometry.Vector3;
 
+import java.util.LinkedHashMap;
+
 import javax.microedition.khronos.opengles.GL10;
 
 /**
+ * Shows a map retrieved from map_store and allows add annotations (i.e. semantic information)
+ *
  * @author jorge@yujinrobot.com (Jorge Santos Simon)
  */
 public class MapAnnotationLayer extends DefaultLayer {
 
-    private static final String MAP_FRAME = "map";
+    private static final String DEFAULT_MAP_FRAME = "/map";
 
     private final Context context;
     private Annotation annotation;
@@ -67,14 +71,17 @@ public class MapAnnotationLayer extends DefaultLayer {
     private PoseShape origin_shape;
     private GoalShape camera_shape;
     private double distance = 1.0;
+    private LinkedHashMap<String, Object> params;
 
     public enum Mode {
         ADD_MARKER, ADD_TABLE, ADD_COLUMN, ADD_WALL, ADD_PICKUP
     }
 
-    public MapAnnotationLayer(Context context, AnnotationsList annotationsList) {
+    public MapAnnotationLayer(Context context, AnnotationsList annotationsList,
+                              final LinkedHashMap<String, Object> params) {
         this.context = context;
         this.annotationsList = annotationsList;
+        this.params = params;
     }
 
     public void setMode(Mode mode) {
@@ -83,10 +90,11 @@ public class MapAnnotationLayer extends DefaultLayer {
 
     @Override
     public void draw(GL10 gl) {
+        // Draw currently creating annotation
         if (annotation != null) {
             annotation.draw(gl);
         }
-//        if (origin_shape != null) {  TODO  create tf ref shape   maybe add a layer
+//        if (origin_shape != null) {  TODO  create tf ref shape   maybe add a layer   also, the map appear rotated 90 deg; why???
 //            origin_shape.setTransform(Transform.identity());
 //            origin_shape.draw(gl);
 //        }
@@ -94,12 +102,9 @@ public class MapAnnotationLayer extends DefaultLayer {
 //            camera_shape.setTransform(camera.transform);
 //            camera_shape.draw(gl);
 //        }
+        // Draw already created annotations
         for (Annotation annotation : annotationsList.listFullContent()) {
-
-            //((ColumnShape)ann.getShape()).scale(gl, (float)(camera.getZoom()*distance));
             annotation.draw(gl);
-
- //           Log.e("@@@@@@@@@@", ann.getShape().getTransform().toString());
         }
     }
 
@@ -149,7 +154,11 @@ public class MapAnnotationLayer extends DefaultLayer {
                         FrameTransformTree frameTransformTree, final Camera camera) {
         this.connectedNode = connectedNode;
         this.camera = camera;
-        this.camera.setFrame(MAP_FRAME);
+        if (params.containsKey("map_frame"))
+            this.camera.setFrame((String)params.get("map_frame"));
+        else
+            this.camera.setFrame(DEFAULT_MAP_FRAME);
+
         this.origin_shape = new PoseShape(camera);
         this.camera_shape = new GoalShape();
         this.mode = Mode.ADD_MARKER;
@@ -218,7 +227,7 @@ public class MapAnnotationLayer extends DefaultLayer {
             height_label.setVisibility(View.GONE);  // have no height
         }
 
-        // setup a dialog window
+        // Setup a dialog window
         alertDialogBuilder.setCancelable(false);
         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -247,12 +256,15 @@ public class MapAnnotationLayer extends DefaultLayer {
             }
         });
 
-        // create and show an alert dialog to get annotation info
+        // Create and show an alert dialog to get annotation info
         final AlertDialog alertDlg = alertDialogBuilder.create();
         alertDlg.show();
 
-        // ensure that both fields contain something before enabling OK
-        alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        // Ensure that both fields contain something before enabling OK; however, pickups can have a default value
+        if ((mode == Mode.ADD_PICKUP) && (params.containsKey("pickup_point") == true))
+            name_edit.append(params.get("pickup_point").toString());
+        else
+            alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
 
         name_edit.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {

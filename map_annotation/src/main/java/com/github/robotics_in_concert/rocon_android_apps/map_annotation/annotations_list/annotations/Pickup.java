@@ -46,7 +46,7 @@ public class Pickup extends Annotation {
         return buffer;
     }
 
-    // Dimensions are meaningless for a pickup point
-    public float getRadius() { return 0.02f; }
-    public float getHeight() { return 0.02f; }
+    // Dimensions are meaningless for a pickup point; just set an arbitrary (but visible) size
+    public float getRadius() { return 0.04f; }
+    public float getHeight() { return 0.4f;  }
 }

@@ -1,6 +1,8 @@
 package com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations;
 
 import org.ros.android.view.visualization.Color;
+import org.ros.rosjava_geometry.Transform;
+import org.ros.rosjava_geometry.Vector3;
 
 public class Marker extends Annotation {
     public static final String GROUP_NAME = "AR Markers";
@@ -31,4 +33,10 @@ public class Marker extends Annotation {
     }
 
     public int getId() { return id; }
+
+    public void setHeight(float height)
+    {
+        // Markers have fixed size and are 3D-located, so height represents is z-coordinate
+        this.setTransform(this.getTransform().multiply(Transform.translation(new Vector3(0.0, 0.0, height))));
+    }
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2013 Yujin Robot.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package com.github.robotics_in_concert.rocon_android_apps.map_annotation;
 
 import android.util.Log;
@@ -22,8 +38,14 @@ import org.ros.node.ConnectedNode;
 import org.ros.node.service.ServiceClient;
 import org.ros.node.service.ServiceResponseListener;
 
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
+
+/**
+ * @author jorge@yujinrobot.com (Jorge Santos Simon)
+ *
+ * Handles request/responses with both map_manager and annotations_manager.
+ */
 public class DatabaseManager extends AbstractNodeMain {
 
 	private ConnectedNode connectedNode;
@@ -40,7 +62,7 @@ public class DatabaseManager extends AbstractNodeMain {
     private NameResolver nameResolver;
     private boolean nameResolverSet = false;
 	
-	public DatabaseManager(final Hashtable<String, String> remaps) {
+	public DatabaseManager(final LinkedHashMap<String, String> remaps) {
         // Apply remappings
         if (remaps.containsKey(listSrvName))  listSrvName = remaps.get(listSrvName);
         if (remaps.containsKey(pubSrvName))   pubSrvName  = remaps.get(pubSrvName);
