@@ -77,6 +77,7 @@ public class MainActivity extends ConcertAppActivity {
 	private ViewGroup mainLayout;
 	private ViewGroup sideLayout;
 	private Button backButton;
+    private Button saveButton;
 	private Button chooseMapButton;
 	private MapAnnotationLayer annotationLayer;
 	private ProgressDialog waitingDialog;
@@ -116,8 +117,10 @@ public class MainActivity extends ConcertAppActivity {
 
 		mapView = (VisualizationView) findViewById(R.id.map_view);
 		backButton = (Button) findViewById(R.id.back_button);
+        saveButton = (Button) findViewById(R.id.save_button);
 		chooseMapButton = (Button) findViewById(R.id.choose_map_button);
 
+        saveButton.setEnabled(false);
 		backButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -125,6 +128,7 @@ public class MainActivity extends ConcertAppActivity {
 			}
 		});
 
+        chooseMapButton.setText("Load map");
 		chooseMapButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -302,6 +306,8 @@ public class MainActivity extends ConcertAppActivity {
 							public void onClick(DialogInterface dialog, int itemIndex) {
                                 currentMap = list.get(itemIndex);
 								loadMap(currentMap);
+                                saveButton.setEnabled(true);
+                                chooseMapButton.setText("Change map");
 							}
 						});
 				chooseMapDialog = builder.create();

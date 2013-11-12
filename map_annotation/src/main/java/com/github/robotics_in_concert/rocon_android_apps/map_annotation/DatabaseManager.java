@@ -143,6 +143,11 @@ public class DatabaseManager extends AbstractNodeMain {
 	}
 
     public void saveAnnotations() {
+        if (currentMap == null) {
+            Log.e("MapAnn", "No map set");
+            return;
+        }
+
         if (connectedNode == null) {
             Log.e("MapAnn", "No connected node available");
             return;
