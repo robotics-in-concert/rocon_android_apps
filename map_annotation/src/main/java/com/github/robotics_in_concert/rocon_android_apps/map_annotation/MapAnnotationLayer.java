@@ -57,8 +57,6 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class MapAnnotationLayer extends DefaultLayer {
 
-    private static final String DEFAULT_MAP_FRAME = "/map";
-
     private final Context context;
     private Annotation annotation;
     private GestureDetector gestureDetector;
@@ -157,7 +155,7 @@ public class MapAnnotationLayer extends DefaultLayer {
         if (params.containsKey("map_frame"))
             this.camera.setFrame((String)params.get("map_frame"));
         else
-            this.camera.setFrame(DEFAULT_MAP_FRAME);
+            this.camera.setFrame(context.getString(R.string.default_global_frame));
 
         this.origin_shape = new PoseShape(camera);
         this.camera_shape = new GoalShape();

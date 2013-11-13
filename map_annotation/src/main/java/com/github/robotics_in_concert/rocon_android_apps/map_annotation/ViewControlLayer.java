@@ -16,6 +16,7 @@
 
 package com.github.robotics_in_concert.rocon_android_apps.map_annotation;
 
+import java.util.LinkedHashMap;
 import java.util.concurrent.ExecutorService;
 
 import android.content.Context;
@@ -40,25 +41,20 @@ import org.ros.rosjava_geometry.FrameTransformTree;
  */
 public class ViewControlLayer extends CameraControlLayer {
 
-    private static final String MAP_FRAME = "map";
     private final Context context;
     private final ListenerGroup<CameraControlListener> listeners;
 
+    private LinkedHashMap<String, Object> params;
     private GestureDetector translateGestureDetector;
     private RotateGestureDetector rotateGestureDetector;
     private ScaleGestureDetector zoomGestureDetector;
 
     private VisualizationView mapView;
-    private ViewGroup mainLayout;
-    private ViewGroup sideLayout;
-    private boolean mapViewGestureAvaiable;
+    private boolean mapViewGestureAvailable;
 
 
-    public ViewControlLayer(Context context,
-                            ExecutorService executorService,
-                            VisualizationView mapView,
-                            ViewGroup mainLayout,
-                            ViewGroup sideLayout) {
+    public ViewControlLayer(Context context, ExecutorService executorService, VisualizationView mapView,
+                            final LinkedHashMap<String, Object> params) {
         super(context, executorService);
 
         this.context = context;
@@ -66,12 +62,14 @@ public class ViewControlLayer extends CameraControlLayer {
         listeners = new ListenerGroup<CameraControlListener>(executorService);
 
         this.mapView = mapView;
-        this.mainLayout = mainLayout;
-        this.sideLayout = sideLayout;
-
         this.mapView.setClickable(false);
-        this.mapView.getCamera().jumpToFrame(MAP_FRAME);
-        mapViewGestureAvaiable = true;
+        if (params.containsKey("map_frame"))
+            this.mapView.getCamera().jumpToFrame((String)params.get("map_frame"));
+        else
+            this.mapView.getCamera().jumpToFrame(context.getString(R.string.default_global_frame));
+        mapViewGestureAvailable = true;
+
+        this.params = params;
     }
 
 
@@ -103,7 +101,7 @@ public class ViewControlLayer extends CameraControlLayer {
                             @Override
                             public boolean onScroll(MotionEvent event1, MotionEvent event2,
                                                     final float distanceX, final float distanceY) {
-                                if (mapViewGestureAvaiable) {
+                                if (mapViewGestureAvailable) {
                                     camera.translate(-distanceX, distanceY);
                                     listeners.signal(new SignalRunnable<CameraControlListener>() {
                                         @Override
@@ -122,7 +120,7 @@ public class ViewControlLayer extends CameraControlLayer {
                             @Override
                             public boolean onRotate(MotionEvent event1, MotionEvent event2,
                                                     final double deltaAngle) {
-                                if (mapViewGestureAvaiable) {
+                                if (mapViewGestureAvailable) {
                                     final double focusX = (event1.getX(0) + event1.getX(1)) / 2;
                                     final double focusY = (event1.getY(0) + event1.getY(1)) / 2;
                                     camera.rotate(focusX, focusY, deltaAngle);
@@ -148,7 +146,7 @@ public class ViewControlLayer extends CameraControlLayer {
                                         if (!detector.isInProgress()) {
                                             return false;
                                         }
-                                        if (mapViewGestureAvaiable) {
+                                        if (mapViewGestureAvailable) {
                                             final float focusX = detector.getFocusX();
                                             final float focusY = detector.getFocusY();
                                             final float factor = detector.getScaleFactor();

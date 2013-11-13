@@ -70,12 +70,7 @@ import org.ros.time.NtpTimeProvider;
  */
 public class MainActivity extends ConcertAppActivity {
 
-	private static final String DEFAULT_MAP_FRAME = "/map"; // can take from the map topic? TODO
-    private static final String DEFAULT_MAP_TOPIC = "map";
-
     private VisualizationView mapView;
-	private ViewGroup mainLayout;
-	private ViewGroup sideLayout;
 	private Button backButton;
     private Button saveButton;
 	private Button chooseMapButton;
@@ -137,8 +132,6 @@ public class MainActivity extends ConcertAppActivity {
 		});
 
 //		mapView.getCamera().jumpToFrame(DEFAULT_MAP_FRAME);
-		mainLayout = (ViewGroup) findViewById(R.id.main_layout);
-		sideLayout = (ViewGroup) findViewById(R.id.side_layout);
 
         // Configure the ExpandableListView and its adapter containing current annotations
         ExpandableListView listView = (ExpandableListView) findViewById(R.id.annotations_view);
@@ -187,7 +180,7 @@ public class MainActivity extends ConcertAppActivity {
 		NameResolver appNameSpace = getAppNameSpace();
 
 		ViewControlLayer viewControlLayer = new ViewControlLayer(this,
-				nodeMainExecutor.getScheduledExecutorService(), mapView, mainLayout, sideLayout);
+				nodeMainExecutor.getScheduledExecutorService(), mapView,params);
 
 		viewControlLayer.addListener(new CameraControlListener() {
             @Override
@@ -208,13 +201,14 @@ public class MainActivity extends ConcertAppActivity {
 
 		mapView.addLayer(viewControlLayer);
 
-        String mapTopic = remaps.containsKey(DEFAULT_MAP_TOPIC) ? remaps.get(DEFAULT_MAP_TOPIC) : DEFAULT_MAP_TOPIC;
+        String mapTopic = getString(R.string.default_map_topic);
+        mapTopic = remaps.containsKey(mapTopic) ? remaps.get(mapTopic) : mapTopic;
 
 		mapView.addLayer(new OccupancyGridLayer(mapTopic));
         annotationLayer = new MapAnnotationLayer(this, annotationsList, params);
 		mapView.addLayer(annotationLayer);
 		NtpTimeProvider ntpTimeProvider = new NtpTimeProvider(
-				InetAddressFactory.newFromHostString("192.168.0.1"),
+				InetAddressFactory.newFromHostString("192.168.0.1"), // TODO what is this?
 				nodeMainExecutor.getScheduledExecutorService());
 		ntpTimeProvider.startPeriodicUpdates(1, TimeUnit.MINUTES);
 		nodeConfiguration.setTimeProvider(ntpTimeProvider);
