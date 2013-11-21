@@ -103,7 +103,7 @@ public class MainActivity extends ConcertAppActivity {
 
 		String defaultRobotName = getString(R.string.default_robot);
 		String defaultAppName = getString(R.string.default_app);
-		setDefaultRobotName(defaultRobotName);
+		// TODO nonsense setDefaultRobotName(defaultRobotName);
 		setDefaultAppName(defaultAppName);
 		setDashboardResource(R.id.top_bar);
 		setMainWindowResource(R.layout.main);
@@ -180,7 +180,7 @@ public class MainActivity extends ConcertAppActivity {
 		NameResolver appNameSpace = getAppNameSpace();
 
 		ViewControlLayer viewControlLayer = new ViewControlLayer(this,
-				nodeMainExecutor.getScheduledExecutorService(), mapView,params);
+				nodeMainExecutor.getScheduledExecutorService(), mapView, params);
 
 		viewControlLayer.addListener(new CameraControlListener() {
             @Override
