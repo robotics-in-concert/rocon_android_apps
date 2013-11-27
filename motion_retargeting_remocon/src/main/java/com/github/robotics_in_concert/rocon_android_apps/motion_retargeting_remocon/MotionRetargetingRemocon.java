@@ -50,7 +50,7 @@ public class MotionRetargetingRemocon extends RosAppActivity
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        setDefaultRobotName(getString(R.string.default_robot_name));
+        setDefaultMasterName(getString(R.string.default_robot_name));
         setDefaultAppName(getString(R.string.paired_app_name));
         setDashboardResource(R.id.dashboard);
         setMainWindowResource(R.layout.main);
