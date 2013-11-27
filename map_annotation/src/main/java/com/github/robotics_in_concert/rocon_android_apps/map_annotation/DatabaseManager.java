@@ -61,7 +61,6 @@ public class DatabaseManager extends AbstractNodeMain {
     private String saveSrvName;
     private MapListEntry currentMap;
     private NameResolver nameResolver;
-    private boolean nameResolverSet = false;
 
     public DatabaseManager(final Context context, final AppRemappings remaps) {
         // Apply remappings
@@ -79,9 +78,6 @@ public class DatabaseManager extends AbstractNodeMain {
     }
 
     public void setNameResolver(NameResolver newNameResolver) {
-        nameResolver = newNameResolver;
-        if (nameResolver != null)
-            nameResolverSet = true;
     }
 
     public void setFunction(String function) {
@@ -103,7 +99,7 @@ public class DatabaseManager extends AbstractNodeMain {
     public void listMaps() {
         ServiceClient<ListMapsRequest, ListMapsResponse> listMapsClient;
         try {
-            String srvName = nameResolverSet ? nameResolver.resolve(listSrvName).toString() : listSrvName;
+            String srvName = nameResolver.resolve(listSrvName).toString();
             listMapsClient = connectedNode.newServiceClient(srvName, ListMaps._TYPE);
         } catch (ServiceNotFoundException e) {
             try {
@@ -123,7 +119,7 @@ public class DatabaseManager extends AbstractNodeMain {
         ServiceClient<PublishMapRequest, PublishMapResponse> publishMapClient;
 
         try {
-            String srvName = nameResolverSet ? nameResolver.resolve(pubSrvName).toString() : pubSrvName;
+            String srvName = nameResolver.resolve(pubSrvName).toString();
             publishMapClient = connectedNode.newServiceClient(srvName, PublishMap._TYPE);
         } catch (ServiceNotFoundException e) {
             try {
@@ -151,7 +147,7 @@ public class DatabaseManager extends AbstractNodeMain {
 
         ServiceClient<SaveAnnotationsRequest, SaveAnnotationsResponse> saveClient;
         try {
-            String srvName = nameResolverSet ? nameResolver.resolve(saveSrvName).toString() : saveSrvName;
+            String srvName = nameResolver.resolve(saveSrvName).toString();
             saveClient = connectedNode.newServiceClient(srvName, SaveAnnotations._TYPE);
         } catch (ServiceNotFoundException e) {
             try {

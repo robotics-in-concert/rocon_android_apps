@@ -172,8 +172,6 @@ public class MainActivity extends RosAppActivity {
         nodeConfiguration = NodeConfiguration.newPublic(InetAddressFactory
                 .newNonLoopback().getHostAddress(), getMasterUri());
 
-        NameResolver appNameSpace = getAppNameSpace();
-
         ViewControlLayer viewControlLayer = new ViewControlLayer(this,
                 nodeMainExecutor.getScheduledExecutorService(), mapView, params);
 
@@ -240,7 +238,7 @@ public class MainActivity extends RosAppActivity {
         safeShowWaitingDialog("Waiting...", "Waiting for map list");
 
         DatabaseManager databaseManager = new DatabaseManager(this, remaps);
-        databaseManager.setNameResolver(getAppNameSpace());
+        databaseManager.setNameResolver(getMasterNameSpace());
         databaseManager.setFunction("list");
         safeShowWaitingDialog("Waiting...", "Waiting for map list");
         databaseManager.setListService(new ServiceResponseListener<ListMapsResponse>() {
@@ -306,7 +304,7 @@ public class MainActivity extends RosAppActivity {
     private void loadMap(MapListEntry mapListEntry) {
 
         DatabaseManager databaseManager = new DatabaseManager(this, remaps);
-        databaseManager.setNameResolver(getAppNameSpace());
+        databaseManager.setNameResolver(getMasterNameSpace());
         databaseManager.setFunction("publish");
         databaseManager.setMapId(mapListEntry.getMapId());
 
@@ -336,7 +334,7 @@ public class MainActivity extends RosAppActivity {
 
     public void saveAnnotations(View view) {
         DatabaseManager databaseManager = new DatabaseManager(this, remaps);
-        databaseManager.setNameResolver(getAppNameSpace());
+        databaseManager.setNameResolver(getMasterNameSpace());
         databaseManager.setFunction("save");
         databaseManager.setMap(currentMap);
 

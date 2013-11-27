@@ -72,7 +72,7 @@ public class MotionRetargetingRemocon extends RosAppActivity
         NodeConfiguration nodeConfiguration = NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(), getMasterUri());
 
         availableUsersView = (RosTextView<std_msgs.UInt16MultiArray>) findViewById(R.id.textViewAvailableUsers);
-        availableUsersView.setTopicName(getAppNameSpace().resolve(getString(R.string.available_users_topic_name)).toString());
+        availableUsersView.setTopicName(getMasterNameSpace().resolve(getString(R.string.available_users_topic_name)).toString());
         availableUsersView.setMessageType(std_msgs.UInt16MultiArray._TYPE);
         availableUsersView.setMessageToStringCallable(new MessageCallable<java.lang.String, std_msgs.UInt16MultiArray>()
         {
@@ -97,8 +97,8 @@ public class MotionRetargetingRemocon extends RosAppActivity
         nodeMainExecutor.execute(availableUsersView, nodeConfiguration);
 
         trackedUserView = (RosTextView<std_msgs.UInt16>) findViewById(R.id.textViewTrackedUser);
-        trackedUserView.setTopicName(getAppNameSpace().resolve(getString(R.string.tracked_user_topic_name)).toString());
-        Log.i(TAG, "trackedUserView: Will listen to: " + getAppNameSpace().resolve(getString(R.string.tracked_user_topic_name)).toString());
+        trackedUserView.setTopicName(getMasterNameSpace().resolve(getString(R.string.tracked_user_topic_name)).toString());
+        Log.i(TAG, "trackedUserView: Will listen to: " + getMasterNameSpace().resolve(getString(R.string.tracked_user_topic_name)).toString());
         trackedUserView.setMessageType(std_msgs.UInt16._TYPE);
         trackedUserView.setMessageToStringCallable(new MessageCallable<java.lang.String, std_msgs.UInt16>() {
             @Override
@@ -119,8 +119,8 @@ public class MotionRetargetingRemocon extends RosAppActivity
 
             @Override
             public void onStart(ConnectedNode connectedNode) {
-                newUserPublisher = connectedNode.newPublisher(getAppNameSpace().resolve(getString(R.string.user_chooser_topic_name)).toString(), std_msgs.UInt16._TYPE);
-                Log.i(TAG, "trackedUserView: Will publish to: " + getAppNameSpace().resolve(getString(R.string.user_chooser_topic_name)).toString());
+                newUserPublisher = connectedNode.newPublisher(getMasterNameSpace().resolve(getString(R.string.user_chooser_topic_name)).toString(), std_msgs.UInt16._TYPE);
+                Log.i(TAG, "trackedUserView: Will publish to: " + getMasterNameSpace().resolve(getString(R.string.user_chooser_topic_name)).toString());
                 newUserPublisher.setLatchMode(true);
                 publisher_initialised = true;
             }
@@ -167,7 +167,7 @@ public class MotionRetargetingRemocon extends RosAppActivity
 
             @Override
             public void onStart(ConnectedNode connectedNode) {
-                motionControlPublisher = connectedNode.newPublisher(getAppNameSpace().resolve(getString(R.string.motion_control_topic_name)).toString(), std_msgs.Empty._TYPE);
+                motionControlPublisher = connectedNode.newPublisher(getMasterNameSpace().resolve(getString(R.string.motion_control_topic_name)).toString(), std_msgs.Empty._TYPE);
                 motionControlPublisher.setLatchMode(true);
             }
 
@@ -205,7 +205,7 @@ public class MotionRetargetingRemocon extends RosAppActivity
 
             @Override
             public void onStart(ConnectedNode connectedNode) {
-                motionRecordingPublisher = connectedNode.newPublisher(getAppNameSpace().resolve(getString(R.string.motion_recording_topic_name)).toString(), std_msgs.Empty._TYPE);
+                motionRecordingPublisher = connectedNode.newPublisher(getMasterNameSpace().resolve(getString(R.string.motion_recording_topic_name)).toString(), std_msgs.Empty._TYPE);
                 motionRecordingPublisher.setLatchMode(true);
             }
 
