@@ -16,7 +16,6 @@
 
 package com.github.robotics_in_concert.rocon_android_apps.map_annotation;
 
-import java.util.LinkedHashMap;
 import java.util.concurrent.ExecutorService;
 
 import android.content.Context;
@@ -24,7 +23,6 @@ import android.os.Handler;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.ViewGroup;
 
 import com.github.rosjava.android_apps.application_management.rapp_manager.AppParameters;
 

@@ -24,7 +24,6 @@ import com.github.robotics_in_concert.rocon_android_apps.map_annotation.R;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.*;
 import com.github.rosjava.android_apps.application_management.rapp_manager.AppParameters;
 import com.github.rosjava.android_apps.application_management.rapp_manager.AppRemappings;
-import com.google.common.base.Preconditions;
 
 import org.ros.internal.message.DefaultMessageFactory;
 import org.ros.internal.message.definition.MessageDefinitionReflectionProvider;
@@ -39,8 +38,6 @@ import org.ros.rosjava_geometry.Vector3;
 
 import ar_track_alvar.AlvarMarker;
 import ar_track_alvar.AlvarMarkers;
-
-import java.util.LinkedHashMap;
 
 /**
  * @author jorge@yujinrobot.com (Jorge Santos Simon)
