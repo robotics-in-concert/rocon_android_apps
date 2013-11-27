@@ -18,7 +18,6 @@ package com.github.robotics_in_concert.rocon_android_apps.map_annotation;
 
 import java.sql.Date;
 import java.text.DateFormat;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +31,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 
@@ -48,15 +46,12 @@ import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotati
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Pickup;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Table;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Wall;
-import com.github.rosjava.android_apps.application_management.ConcertAppActivity;
-import com.github.rosjava.android_apps.application_management.ConcertDescription;
 
-import org.ros.exception.RosRuntimeException;
-import org.ros.exception.ServiceNotFoundException;
+import com.github.rosjava.android_apps.application_management.RosAppActivity;
+
 import org.ros.namespace.NameResolver;
 import org.ros.node.NodeConfiguration;
 import org.ros.node.NodeMainExecutor;
-import org.ros.node.service.ServiceClient;
 import org.ros.node.service.ServiceResponseListener;
 import org.ros.address.InetAddressFactory;
 import org.ros.android.view.visualization.VisualizationView;
@@ -68,17 +63,17 @@ import org.ros.time.NtpTimeProvider;
 /**
  * @author jorge@yujinrobot.com (Jorge Santos Simon)
  */
-public class MainActivity extends ConcertAppActivity {
+public class MainActivity extends RosAppActivity {
 
     private VisualizationView mapView;
-	private Button backButton;
+    private Button backButton;
     private Button saveButton;
-	private Button chooseMapButton;
-	private MapAnnotationLayer annotationLayer;
-	private ProgressDialog waitingDialog;
-	private AlertDialog chooseMapDialog;
-	private NodeMainExecutor nodeMainExecutor;
-	private NodeConfiguration nodeConfiguration;
+    private Button chooseMapButton;
+    private MapAnnotationLayer annotationLayer;
+    private ProgressDialog waitingDialog;
+    private AlertDialog chooseMapDialog;
+    private NodeMainExecutor nodeMainExecutor;
+    private NodeConfiguration nodeConfiguration;
     private AnnotationsList annotationsList;
     private AnnotationsPublisher annotationsPub;
     private MapListEntry currentMap;
@@ -92,46 +87,46 @@ public class MainActivity extends ConcertAppActivity {
         }
     };
 
-	public MainActivity() {
-		// The RosActivity constructor configures the notification title and ticker messages.
-		super("Map annotation", "Map annotation");
-	}
+    public MainActivity() {
+        // The RosActivity constructor configures the notification title and ticker messages.
+        super("Map annotation", "Map annotation");
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
 
-		String defaultRobotName = getString(R.string.default_robot);
-		String defaultAppName = getString(R.string.default_app);
-		// TODO nonsense setDefaultRobotName(defaultRobotName);
-		setDefaultAppName(defaultAppName);
-		setDashboardResource(R.id.top_bar);
-		setMainWindowResource(R.layout.main);
+        String defaultRobotName = getString(R.string.default_robot);
+        String defaultAppName = getString(R.string.default_app);
+        // TODO nonsense setDefaultRobotName(defaultRobotName);
+        setDefaultAppName(defaultAppName);
+        setDashboardResource(R.id.top_bar);
+        setMainWindowResource(R.layout.main);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-		mapView = (VisualizationView) findViewById(R.id.map_view);
-		backButton = (Button) findViewById(R.id.back_button);
+        mapView = (VisualizationView) findViewById(R.id.map_view);
+        backButton = (Button) findViewById(R.id.back_button);
         saveButton = (Button) findViewById(R.id.save_button);
-		chooseMapButton = (Button) findViewById(R.id.choose_map_button);
+        chooseMapButton = (Button) findViewById(R.id.choose_map_button);
 
         saveButton.setEnabled(false);
-		backButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				onBackPressed();
-			}
-		});
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         chooseMapButton.setText("Load map");
-		chooseMapButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				onChooseMapButtonPressed();
-			}
-		});
+        chooseMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onChooseMapButtonPressed();
+            }
+        });
 
-//		mapView.getCamera().jumpToFrame(DEFAULT_MAP_FRAME);
+//        mapView.getCamera().jumpToFrame(DEFAULT_MAP_FRAME);
 
         // Configure the ExpandableListView and its adapter containing current annotations
         ExpandableListView listView = (ExpandableListView) findViewById(R.id.annotations_view);
@@ -164,25 +159,25 @@ public class MainActivity extends ConcertAppActivity {
         annotationsList.addGroup(new Column(""));
         annotationsList.addGroup(new Wall(""));
 
-        annotationsPub = new AnnotationsPublisher(params, remaps, annotationsList);
+        annotationsPub = new AnnotationsPublisher(this, annotationsList, params, remaps);
         listView.setAdapter(annotationsList);
-	}
+    }
 
-	@Override
-	protected void init(NodeMainExecutor nodeMainExecutor) {
+    @Override
+    protected void init(NodeMainExecutor nodeMainExecutor) {
 
-		super.init(nodeMainExecutor);
-		
-		this.nodeMainExecutor = nodeMainExecutor;
-		nodeConfiguration = NodeConfiguration.newPublic(InetAddressFactory
-				.newNonLoopback().getHostAddress(), getMasterUri());
+        super.init(nodeMainExecutor);
+        
+        this.nodeMainExecutor = nodeMainExecutor;
+        nodeConfiguration = NodeConfiguration.newPublic(InetAddressFactory
+                .newNonLoopback().getHostAddress(), getMasterUri());
 
-		NameResolver appNameSpace = getAppNameSpace();
+        NameResolver appNameSpace = getAppNameSpace();
 
-		ViewControlLayer viewControlLayer = new ViewControlLayer(this,
-				nodeMainExecutor.getScheduledExecutorService(), mapView, params);
+        ViewControlLayer viewControlLayer = new ViewControlLayer(this,
+                nodeMainExecutor.getScheduledExecutorService(), mapView, params);
 
-		viewControlLayer.addListener(new CameraControlListener() {
+        viewControlLayer.addListener(new CameraControlListener() {
             @Override
             public void onZoom(double focusX, double focusY, double factor) {
 
@@ -199,33 +194,31 @@ public class MainActivity extends ConcertAppActivity {
             }
         });
 
-		mapView.addLayer(viewControlLayer);
+        mapView.addLayer(viewControlLayer);
 
-        String mapTopic = getString(R.string.default_map_topic);
-        mapTopic = remaps.containsKey(mapTopic) ? remaps.get(mapTopic) : mapTopic;
-
-		mapView.addLayer(new OccupancyGridLayer(mapTopic));
+        String mapTopic = remaps.get(getString(R.string.map_topic));
+        mapView.addLayer(new OccupancyGridLayer(mapTopic));
         annotationLayer = new MapAnnotationLayer(this, annotationsList, params);
-		mapView.addLayer(annotationLayer);
-		NtpTimeProvider ntpTimeProvider = new NtpTimeProvider(
-				InetAddressFactory.newFromHostString("192.168.0.1"), // TODO what is this?
-				nodeMainExecutor.getScheduledExecutorService());
-		ntpTimeProvider.startPeriodicUpdates(1, TimeUnit.MINUTES);
-		nodeConfiguration.setTimeProvider(ntpTimeProvider);
-		nodeMainExecutor.execute(mapView, nodeConfiguration.setNodeName("android/map_view"));
+        mapView.addLayer(annotationLayer);
+        NtpTimeProvider ntpTimeProvider = new NtpTimeProvider(
+                InetAddressFactory.newFromHostString("192.168.0.1"), // TODO what is this?
+                nodeMainExecutor.getScheduledExecutorService());
+        ntpTimeProvider.startPeriodicUpdates(1, TimeUnit.MINUTES);
+        nodeConfiguration.setTimeProvider(ntpTimeProvider);
+        nodeMainExecutor.execute(mapView, nodeConfiguration.setNodeName("android/map_view"));
 
         nodeMainExecutor.execute(annotationsPub, nodeConfiguration.setNodeName("android/annotations_pub"));
 
-		readAvailableMapList();
-	}
+        readAvailableMapList();
+    }
 
-	private void onChooseMapButtonPressed() {
-		readAvailableMapList();
-	}
+    private void onChooseMapButtonPressed() {
+        readAvailableMapList();
+    }
 
-	public void addMarkerClicked(View view) {
+    public void addMarkerClicked(View view) {
         annotationLayer.setMode(MapAnnotationLayer.Mode.ADD_MARKER);
-	}
+    }
 
     public void addColumnClicked(View view) {
         annotationLayer.setMode(MapAnnotationLayer.Mode.ADD_COLUMN);
@@ -243,106 +236,106 @@ public class MainActivity extends ConcertAppActivity {
         annotationLayer.setMode(MapAnnotationLayer.Mode.ADD_PICKUP);
     }
 
-	private void readAvailableMapList() {
-		safeShowWaitingDialog("Waiting...", "Waiting for map list");
+    private void readAvailableMapList() {
+        safeShowWaitingDialog("Waiting...", "Waiting for map list");
 
-		DatabaseManager databaseManager = new DatabaseManager(remaps);
+        DatabaseManager databaseManager = new DatabaseManager(this, remaps);
         databaseManager.setNameResolver(getAppNameSpace());
-		databaseManager.setFunction("list");
-		safeShowWaitingDialog("Waiting...", "Waiting for map list");
-		databaseManager.setListService(new ServiceResponseListener<ListMapsResponse>() {
-					@Override
-					public void onSuccess(ListMapsResponse message) {
-						Log.i("MapAnn", "readAvailableMapList() Success");
-						safeDismissWaitingDialog();
-						showMapListDialog(message.getMapList());
-					}
+        databaseManager.setFunction("list");
+        safeShowWaitingDialog("Waiting...", "Waiting for map list");
+        databaseManager.setListService(new ServiceResponseListener<ListMapsResponse>() {
+                    @Override
+                    public void onSuccess(ListMapsResponse message) {
+                        Log.i("MapAnn", "readAvailableMapList() Success");
+                        safeDismissWaitingDialog();
+                        showMapListDialog(message.getMapList());
+                    }
 
-					@Override
-					public void onFailure(RemoteException e) {
-						Log.i("MapAnn", "readAvailableMapList() Failure");
-						safeDismissWaitingDialog();
-					}
-				});
+                    @Override
+                    public void onFailure(RemoteException e) {
+                        Log.i("MapAnn", "readAvailableMapList() Failure");
+                        safeDismissWaitingDialog();
+                    }
+                });
 
-		nodeMainExecutor.execute(databaseManager,
-				nodeConfiguration.setNodeName("android/list_maps"));
-	}
+        nodeMainExecutor.execute(databaseManager,
+                nodeConfiguration.setNodeName("android/list_maps"));
+    }
 
-	/**
-	 * Show a dialog with a list of maps. Safe to call from any thread.
-	 */
-	private void showMapListDialog(final List<MapListEntry> list) {
-		// Make an array of map name/date strings.
-		final CharSequence[] availableMapNames = new CharSequence[list.size()];
-		for (int i = 0; i < list.size(); i++) {
-			String displayString;
-			String name = list.get(i).getName();
-			Date creationDate = new Date(list.get(i).getDate() * 1000);
-			String dateTime = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
-					DateFormat.SHORT).format(creationDate);
-			if (name != null && !name.equals("")) {
-				displayString = name + " " + dateTime;
-			} else {
-				displayString = dateTime;
-			}
-			availableMapNames[i] = displayString;
-		}
+    /**
+     * Show a dialog with a list of maps. Safe to call from any thread.
+     */
+    private void showMapListDialog(final List<MapListEntry> list) {
+        // Make an array of map name/date strings.
+        final CharSequence[] availableMapNames = new CharSequence[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            String displayString;
+            String name = list.get(i).getName();
+            Date creationDate = new Date(list.get(i).getDate() * 1000);
+            String dateTime = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
+                    DateFormat.SHORT).format(creationDate);
+            if (name != null && !name.equals("")) {
+                displayString = name + " " + dateTime;
+            } else {
+                displayString = dateTime;
+            }
+            availableMapNames[i] = displayString;
+        }
 
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-				builder.setTitle("Choose a map");
-				builder.setItems(availableMapNames,
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int itemIndex) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Choose a map");
+                builder.setItems(availableMapNames,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int itemIndex) {
                                 currentMap = list.get(itemIndex);
-								loadMap(currentMap);
+                                loadMap(currentMap);
                                 saveButton.setEnabled(true);
                                 chooseMapButton.setText("Change map");
-							}
-						});
-				chooseMapDialog = builder.create();
-				chooseMapDialog.show();
-			}
-		});
-	}
+                            }
+                        });
+                chooseMapDialog = builder.create();
+                chooseMapDialog.show();
+            }
+        });
+    }
 
-	private void loadMap(MapListEntry mapListEntry) {
+    private void loadMap(MapListEntry mapListEntry) {
 
-		DatabaseManager databaseManager = new DatabaseManager(remaps);
+        DatabaseManager databaseManager = new DatabaseManager(this, remaps);
         databaseManager.setNameResolver(getAppNameSpace());
-		databaseManager.setFunction("publish");
-		databaseManager.setMapId(mapListEntry.getMapId());
+        databaseManager.setFunction("publish");
+        databaseManager.setMapId(mapListEntry.getMapId());
 
-		safeShowWaitingDialog("Waiting...", "Loading map");
-		try {
-			databaseManager
-					.setPublishService(new ServiceResponseListener<PublishMapResponse>() {
-						@Override
-						public void onSuccess(PublishMapResponse message) {
-							Log.i("MapAnn", "loadMap() Success");
+        safeShowWaitingDialog("Waiting...", "Loading map");
+        try {
+            databaseManager
+                    .setPublishService(new ServiceResponseListener<PublishMapResponse>() {
+                        @Override
+                        public void onSuccess(PublishMapResponse message) {
+                            Log.i("MapAnn", "loadMap() Success");
                             safeDismissWaitingDialog();
-						}
+                        }
 
-						@Override
-						public void onFailure(RemoteException e) {
-							Log.i("MapAnn", "loadMap() Failure");
-							safeDismissWaitingDialog();
-						}
-					});
-		} catch (Throwable ex) {
-			Log.e("MapAnn", "loadMap() caught exception.", ex);
-			safeDismissWaitingDialog();
-		}
-		nodeMainExecutor.execute(databaseManager,
-				nodeConfiguration.setNodeName("android/publish_map"));
-	}
+                        @Override
+                        public void onFailure(RemoteException e) {
+                            Log.i("MapAnn", "loadMap() Failure");
+                            safeDismissWaitingDialog();
+                        }
+                    });
+        } catch (Throwable ex) {
+            Log.e("MapAnn", "loadMap() caught exception.", ex);
+            safeDismissWaitingDialog();
+        }
+        nodeMainExecutor.execute(databaseManager,
+                nodeConfiguration.setNodeName("android/publish_map"));
+    }
 
     public void saveAnnotations(View view) {
-        DatabaseManager databaseManager = new DatabaseManager(remaps);
+        DatabaseManager databaseManager = new DatabaseManager(this, remaps);
         databaseManager.setNameResolver(getAppNameSpace());
         databaseManager.setFunction("save");
         databaseManager.setMap(currentMap);
@@ -370,66 +363,66 @@ public class MainActivity extends ConcertAppActivity {
                 nodeConfiguration.setNodeName("android/save_annotations"));
     }
 
-	private void safeDismissChooseMapDialog() {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				if (chooseMapDialog != null) {
-					chooseMapDialog.dismiss();
-					chooseMapDialog = null;
-				}
-			}
-		});
-	}
+    private void safeDismissChooseMapDialog() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (chooseMapDialog != null) {
+                    chooseMapDialog.dismiss();
+                    chooseMapDialog = null;
+                }
+            }
+        });
+    }
 
-	private void showWaitingDialog(final CharSequence title,
-			final CharSequence message) {
-		dismissWaitingDialog();
-		waitingDialog = ProgressDialog.show(MainActivity.this, title, message,
-				true);
-		waitingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-	}
+    private void showWaitingDialog(final CharSequence title,
+            final CharSequence message) {
+        dismissWaitingDialog();
+        waitingDialog = ProgressDialog.show(MainActivity.this, title, message,
+                true);
+        waitingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+    }
 
-	private void dismissWaitingDialog() {
-		if (waitingDialog != null) {
-			waitingDialog.dismiss();
-			waitingDialog = null;
-		}
-	}
+    private void dismissWaitingDialog() {
+        if (waitingDialog != null) {
+            waitingDialog.dismiss();
+            waitingDialog = null;
+        }
+    }
 
-	private void safeShowWaitingDialog(final CharSequence title,
-			final CharSequence message) {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				showWaitingDialog(title, message);
-			}
-		});
-	}
+    private void safeShowWaitingDialog(final CharSequence title,
+            final CharSequence message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                showWaitingDialog(title, message);
+            }
+        });
+    }
 
-	private void safeDismissWaitingDialog() {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				dismissWaitingDialog();
-			}
-		});
-	}
+    private void safeDismissWaitingDialog() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dismissWaitingDialog();
+            }
+        });
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(0, 0, 0, R.string.stop_app);
-		return super.onCreateOptionsMenu(menu);
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, 0, 0, R.string.stop_app);
+        return super.onCreateOptionsMenu(menu);
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		super.onOptionsItemSelected(item);
-		switch (item.getItemId()) {
-		case 0:
-			onDestroy();
-			break;
-		}
-		return true;
-	}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+        case 0:
+            onDestroy();
+            break;
+        }
+        return true;
+    }
 }

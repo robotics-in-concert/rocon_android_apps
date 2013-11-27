@@ -16,10 +16,14 @@
 
 package com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list;
 
+import android.content.Context;
 import android.database.DataSetObserver;
 import android.util.Log;
 
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.R;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.*;
+import com.github.rosjava.android_apps.application_management.rapp_manager.AppParameters;
+import com.github.rosjava.android_apps.application_management.rapp_manager.AppRemappings;
 import com.google.common.base.Preconditions;
 
 import org.ros.internal.message.DefaultMessageFactory;
@@ -48,7 +52,7 @@ public class AnnotationsPublisher extends DataSetObserver implements NodeMain {
 
     private AnnotationsList annotationsList;
 
-    private String mapFrame = "/map";  // TODO take from map description instead of being a parameter
+    private String mapFrame;  // TODO take from map description instead of being a parameter
 
     private String markersTopic = "markers";
     private String tablesTopic  = "tables";
@@ -66,14 +70,14 @@ public class AnnotationsPublisher extends DataSetObserver implements NodeMain {
 
     private boolean initialized = false;
 
-    public AnnotationsPublisher(final LinkedHashMap<String, Object> params,
-                                final LinkedHashMap<String, String> remaps, AnnotationsList list) {
-        if (params.containsKey("map_frame")) mapFrame = (String)params.get("map_frame");
+    public AnnotationsPublisher(final Context context, final AnnotationsList list,
+                                final AppParameters params, final AppRemappings remaps) {
+        mapFrame = (String)params.get("map_frame", context.getString(R.string.map_frame));
 
-        if (remaps.containsKey(markersTopic)) markersTopic = remaps.get(markersTopic);
-        if (remaps.containsKey(tablesTopic))  tablesTopic  = remaps.get(tablesTopic);
-        if (remaps.containsKey(columnsTopic)) columnsTopic = remaps.get(columnsTopic);
-        if (remaps.containsKey(wallsTopic))   wallsTopic   = remaps.get(wallsTopic);
+        markersTopic = remaps.get(markersTopic);
+        tablesTopic  = remaps.get(tablesTopic);
+        columnsTopic = remaps.get(columnsTopic);
+        wallsTopic   = remaps.get(wallsTopic);
 
         this.annotationsList = list;
         this.annotationsList.registerDataSetObserver(this);

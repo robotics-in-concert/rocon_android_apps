@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.AnnotationsList;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.*;
+import com.github.rosjava.android_apps.application_management.rapp_manager.AppParameters;
 import com.google.common.base.Preconditions;
 
 import org.ros.android.view.visualization.Camera;
@@ -45,8 +46,6 @@ import org.ros.node.Node;
 import org.ros.rosjava_geometry.FrameTransformTree;
 import org.ros.rosjava_geometry.Transform;
 import org.ros.rosjava_geometry.Vector3;
-
-import java.util.LinkedHashMap;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -69,14 +68,14 @@ public class MapAnnotationLayer extends DefaultLayer {
     private PoseShape origin_shape;
     private GoalShape camera_shape;
     private double distance = 1.0;
-    private LinkedHashMap<String, Object> params;
+    private AppParameters params;
 
     public enum Mode {
         ADD_MARKER, ADD_TABLE, ADD_COLUMN, ADD_WALL, ADD_PICKUP
     }
 
-    public MapAnnotationLayer(Context context, AnnotationsList annotationsList,
-                              final LinkedHashMap<String, Object> params) {
+    public MapAnnotationLayer(final Context context, final AnnotationsList annotationsList,
+                              final AppParameters params) {
         this.context = context;
         this.annotationsList = annotationsList;
         this.params = params;
@@ -152,11 +151,7 @@ public class MapAnnotationLayer extends DefaultLayer {
                         FrameTransformTree frameTransformTree, final Camera camera) {
         this.connectedNode = connectedNode;
         this.camera = camera;
-        if (params.containsKey("map_frame"))
-            this.camera.setFrame((String)params.get("map_frame"));
-        else
-            this.camera.setFrame(context.getString(R.string.default_global_frame));
-
+        this.camera.setFrame((String) params.get("map_frame", context.getString(R.string.map_frame)));
         this.origin_shape = new PoseShape(camera);
         this.camera_shape = new GoalShape();
         this.mode = Mode.ADD_MARKER;

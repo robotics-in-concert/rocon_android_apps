@@ -26,6 +26,8 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ViewGroup;
 
+import com.github.rosjava.android_apps.application_management.rapp_manager.AppParameters;
+
 import org.ros.android.view.visualization.Camera;
 import org.ros.android.view.visualization.RotateGestureDetector;
 import org.ros.android.view.visualization.VisualizationView;
@@ -44,7 +46,6 @@ public class ViewControlLayer extends CameraControlLayer {
     private final Context context;
     private final ListenerGroup<CameraControlListener> listeners;
 
-    private LinkedHashMap<String, Object> params;
     private GestureDetector translateGestureDetector;
     private RotateGestureDetector rotateGestureDetector;
     private ScaleGestureDetector zoomGestureDetector;
@@ -54,7 +55,7 @@ public class ViewControlLayer extends CameraControlLayer {
 
 
     public ViewControlLayer(Context context, ExecutorService executorService, VisualizationView mapView,
-                            final LinkedHashMap<String, Object> params) {
+                            final AppParameters params) {
         super(context, executorService);
 
         this.context = context;
@@ -63,13 +64,9 @@ public class ViewControlLayer extends CameraControlLayer {
 
         this.mapView = mapView;
         this.mapView.setClickable(false);
-        if (params.containsKey("map_frame"))
-            this.mapView.getCamera().jumpToFrame((String)params.get("map_frame"));
-        else
-            this.mapView.getCamera().jumpToFrame(context.getString(R.string.default_global_frame));
-        mapViewGestureAvailable = true;
+        this.mapView.getCamera().jumpToFrame((String)params.get("map_frame", context.getString(R.string.map_frame)));
 
-        this.params = params;
+        mapViewGestureAvailable = true;
     }
 
 

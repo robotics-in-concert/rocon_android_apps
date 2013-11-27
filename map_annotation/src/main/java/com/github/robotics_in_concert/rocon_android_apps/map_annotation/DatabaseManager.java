@@ -16,7 +16,10 @@
 
 package com.github.robotics_in_concert.rocon_android_apps.map_annotation;
 
+import android.content.Context;
 import android.util.Log;
+
+import com.github.rosjava.android_apps.application_management.rapp_manager.AppRemappings;
 
 import map_store.ListMaps;
 import map_store.ListMapsRequest;
@@ -38,40 +41,38 @@ import org.ros.node.ConnectedNode;
 import org.ros.node.service.ServiceClient;
 import org.ros.node.service.ServiceResponseListener;
 
-import java.util.LinkedHashMap;
-
 
 /**
  * @author jorge@yujinrobot.com (Jorge Santos Simon)
- *
+ * <p/>
  * Handles request/responses with both map_manager and annotations_manager.
  */
 public class DatabaseManager extends AbstractNodeMain {
 
-	private ConnectedNode connectedNode;
-	private String function;
-	private ServiceResponseListener<ListMapsResponse> listServiceResponseListener;
-	private ServiceResponseListener<PublishMapResponse> publishServiceResponseListener;
+    private ConnectedNode connectedNode;
+    private String function;
+    private ServiceResponseListener<ListMapsResponse> listServiceResponseListener;
+    private ServiceResponseListener<PublishMapResponse> publishServiceResponseListener;
     private ServiceResponseListener<SaveAnnotationsResponse> saveServiceResponseListener;
 
-	private String mapId;
-    private String listSrvName = "list_maps";
-    private String pubSrvName  = "publish_map";
-    private String saveSrvName = "save_annotations";
+    private String mapId;
+    private String listSrvName;
+    private String pubSrvName;
+    private String saveSrvName;
     private MapListEntry currentMap;
     private NameResolver nameResolver;
     private boolean nameResolverSet = false;
-	
-	public DatabaseManager(final LinkedHashMap<String, String> remaps) {
+
+    public DatabaseManager(final Context context, final AppRemappings remaps) {
         // Apply remappings
-        if (remaps.containsKey(listSrvName))  listSrvName = remaps.get(listSrvName);
-        if (remaps.containsKey(pubSrvName))   pubSrvName  = remaps.get(pubSrvName);
-        if (remaps.containsKey(saveSrvName))  saveSrvName = remaps.get(saveSrvName);
-	}
-	
-	public void setMapId(String mapId) {
-		this.mapId = mapId;
-	}
+        listSrvName = remaps.get(context.getString(R.string.list_maps_srv));
+        pubSrvName = remaps.get(context.getString(R.string.publish_map_srv));
+        saveSrvName = remaps.get(context.getString(R.string.save_annotations_srv));
+    }
+
+    public void setMapId(String mapId) {
+        this.mapId = mapId;
+    }
 
     public void setMap(MapListEntry currentMap) {
         this.currentMap = currentMap;
@@ -84,63 +85,58 @@ public class DatabaseManager extends AbstractNodeMain {
     }
 
     public void setFunction(String function) {
-		this.function = function;
-	}
-	
-	public void setListService(ServiceResponseListener<ListMapsResponse> listServiceResponseListener)
-    {
-		this.listServiceResponseListener = listServiceResponseListener;
-	}
-	
-	public void setPublishService(ServiceResponseListener<PublishMapResponse> publishServiceResponseListener)
-    {
-		this.publishServiceResponseListener = publishServiceResponseListener;
-	}
+        this.function = function;
+    }
 
-    public void setSaveService(ServiceResponseListener<SaveAnnotationsResponse> saveServiceResponseListener)
-    {
+    public void setListService(ServiceResponseListener<ListMapsResponse> listServiceResponseListener) {
+        this.listServiceResponseListener = listServiceResponseListener;
+    }
+
+    public void setPublishService(ServiceResponseListener<PublishMapResponse> publishServiceResponseListener) {
+        this.publishServiceResponseListener = publishServiceResponseListener;
+    }
+
+    public void setSaveService(ServiceResponseListener<SaveAnnotationsResponse> saveServiceResponseListener) {
         this.saveServiceResponseListener = saveServiceResponseListener;
     }
 
     public void listMaps() {
-		ServiceClient<ListMapsRequest, ListMapsResponse> listMapsClient;
-		try
-        {
+        ServiceClient<ListMapsRequest, ListMapsResponse> listMapsClient;
+        try {
             String srvName = nameResolverSet ? nameResolver.resolve(listSrvName).toString() : listSrvName;
-			listMapsClient = connectedNode.newServiceClient(srvName, ListMaps._TYPE);
-		} catch (ServiceNotFoundException e) {
-		          try {
-		            Thread.sleep(1000L);
-		            listMaps();
-		            return;
-		          } catch (Exception ex) {}
-		        
-		        e.printStackTrace();
-			throw new RosRuntimeException(e);
-		}
-		final ListMapsRequest request = listMapsClient.newMessage();
-		listMapsClient.call(request, listServiceResponseListener);
-	}
-	
-	public void publishMap() {
-		ServiceClient<PublishMapRequest, PublishMapResponse> publishMapClient;
-		
-		try
-        {
+            listMapsClient = connectedNode.newServiceClient(srvName, ListMaps._TYPE);
+        } catch (ServiceNotFoundException e) {
+            try {
+                Thread.sleep(1000L);
+                listMaps();
+                return;
+            } catch (Exception ex) { }
+
+            e.printStackTrace();
+            throw new RosRuntimeException(e);
+        }
+        final ListMapsRequest request = listMapsClient.newMessage();
+        listMapsClient.call(request, listServiceResponseListener);
+    }
+
+    public void publishMap() {
+        ServiceClient<PublishMapRequest, PublishMapResponse> publishMapClient;
+
+        try {
             String srvName = nameResolverSet ? nameResolver.resolve(pubSrvName).toString() : pubSrvName;
-			publishMapClient = connectedNode.newServiceClient(srvName, PublishMap._TYPE);
-		} catch (ServiceNotFoundException e) {
-			 try {
-		            Thread.sleep(1000L);
-		            listMaps();
-		            return;
-		          } catch (Exception ex) {}
-			throw new RosRuntimeException(e);
-		}
-		final PublishMapRequest request = publishMapClient.newMessage();
-		request.setMapId(mapId);
-		publishMapClient.call(request, publishServiceResponseListener);
-	}
+            publishMapClient = connectedNode.newServiceClient(srvName, PublishMap._TYPE);
+        } catch (ServiceNotFoundException e) {
+            try {
+                Thread.sleep(1000L);
+                listMaps();
+                return;
+            } catch (Exception ex) { }
+            throw new RosRuntimeException(e);
+        }
+        final PublishMapRequest request = publishMapClient.newMessage();
+        request.setMapId(mapId);
+        publishMapClient.call(request, publishServiceResponseListener);
+    }
 
     public void saveAnnotations() {
         if (currentMap == null) {
@@ -154,16 +150,14 @@ public class DatabaseManager extends AbstractNodeMain {
         }
 
         ServiceClient<SaveAnnotationsRequest, SaveAnnotationsResponse> saveClient;
-        try
-        {
+        try {
             String srvName = nameResolverSet ? nameResolver.resolve(saveSrvName).toString() : saveSrvName;
             saveClient = connectedNode.newServiceClient(srvName, SaveAnnotations._TYPE);
         } catch (ServiceNotFoundException e) {
             try {
                 Thread.sleep(1000L); // TODO  why???
                 return;
-            } catch (Exception ex) {
-            }
+            } catch (Exception ex) { }
             throw new RosRuntimeException(e);
         }
         final SaveAnnotationsRequest request = saveClient.newMessage();
@@ -173,17 +167,17 @@ public class DatabaseManager extends AbstractNodeMain {
         saveClient.call(request, saveServiceResponseListener);
     }
 
-	@Override
-	public GraphName getDefaultNodeName() {
-		return null;
-	}
-	
-	public void onStart(final ConnectedNode connectedNode) {
-		this.connectedNode = connectedNode;
-		if (function.equals("list")) {
-			listMaps();
-		} else if (function.equals("publish")) {
-			publishMap();
+    @Override
+    public GraphName getDefaultNodeName() {
+        return null;
+    }
+
+    public void onStart(final ConnectedNode connectedNode) {
+        this.connectedNode = connectedNode;
+        if (function.equals("list")) {
+            listMaps();
+        } else if (function.equals("publish")) {
+            publishMap();
         } else if (function.equals("save")) {
             saveAnnotations();
         }
