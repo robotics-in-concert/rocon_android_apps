@@ -77,7 +77,8 @@ public class DatabaseManager extends AbstractNodeMain {
         this.currentMap = currentMap;
     }
 
-    public void setNameResolver(NameResolver newNameResolver) {
+    public void setNameResolver(NameResolver nameResolver) {
+        this.nameResolver = nameResolver;
     }
 
     public void setFunction(String function) {
