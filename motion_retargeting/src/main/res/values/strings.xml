@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">MotionRetargetingRemocon</string>
     <string name="app_label">MotionRetargetingRemote</string>
-    <string name="node_name">motion_retargeting_remocon</string>
+    <string name="node_name">motion_retargeting</string>
     <string name="default_robot_name">robot</string>
     <string name="paired_app_name">rocon_android_apps/motion_retargeting</string>
     <string name="stop_app">Stop App</string>

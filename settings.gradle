@@ -18,5 +18,5 @@
 include 'my_android_project'
 include 'my_android_library_project'
 */
-include 'motion_retargeting_remocon'
+include 'motion_retargeting'
 include 'map_annotation'

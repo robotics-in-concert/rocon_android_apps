@@ -1,6 +1,5 @@
-package com.github.robotics_in_concert.rocon_android_apps.motion_retargeting_remocon;
+package com.github.robotics_in_concert.rocon_android_apps.motion_retargeting;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -23,10 +22,7 @@ import org.ros.node.NodeConfiguration;
 import org.ros.node.NodeMainExecutor;
 import org.ros.node.topic.Publisher;
 
-import std_msgs.*;
-import std_msgs.String;
-
-public class MotionRetargetingRemocon extends RosAppActivity
+public class MotionRetargeting extends RosAppActivity
 {
     private RosTextView<std_msgs.UInt16MultiArray> availableUsersView;
     private RosTextView<std_msgs.UInt16> trackedUserView;
@@ -39,11 +35,11 @@ public class MotionRetargetingRemocon extends RosAppActivity
     private Publisher<std_msgs.Empty> motionRecordingPublisher;
     boolean publisher_initialised = false;
 
-    private static final java.lang.String TAG = "MotionRetargetingRemocon";
+    private static final java.lang.String TAG = "MotionRetargeting";
 
-    public MotionRetargetingRemocon()
+    public MotionRetargeting()
     {
-        super("MotionRetargetingRemocon", "MotionRetargetingRemocon");
+        super("MotionRetargeting", "MotionRetargeting");
     }
 
     /** Called when the activity is first created. */
