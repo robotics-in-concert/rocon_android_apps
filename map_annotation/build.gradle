@@ -20,7 +20,7 @@ dependencies {
   compile 'org.ros.rosjava_messages:map_store:[0.3,0.4)'
   compile 'org.ros.rosjava_messages:annotations_store:[0.1,0.2)'
   compile 'org.ros.rosjava_messages:yocs_msgs:[0.5.2,0.6)'
-  compile 'org.ros.rosjava_messages:ar_track_alvar:[0.3,0.4)'
+//  compile 'org.ros.rosjava_messages:ar_track_alvar:[0.3,0.4)'
 }
 
 apply plugin: 'android'
