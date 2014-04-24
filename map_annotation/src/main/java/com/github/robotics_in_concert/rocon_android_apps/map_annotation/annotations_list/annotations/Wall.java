@@ -45,7 +45,7 @@ public class Wall extends Annotation {
         height = DEFAULT_HEIGHT;
     }
 
-    public float getLength() { return sizeXY; }
+    public float getLength() { return super.getSizeXY(); }
     public float getWidth()  { return DEFAULT_WIDTH; }
 
     @Override
@@ -53,5 +53,9 @@ public class Wall extends Annotation {
         // The scale is in metric space, so we can directly use shape's size.
         // Note that we scale only in y (width) dimension; wall's thickness remains constant
         gl.glScalef(1.0f, sizeXY / MINIMUM_LENGTH, 1.0f);
+    }
+    @Override
+    protected  void invertScale(GL10 gl){
+        gl.glScalef( 1.0f, MINIMUM_LENGTH / sizeXY, 1.0f);
     }
 }

@@ -57,4 +57,8 @@ public class Table extends Annotation {
         // The scale is in metric space, so we can directly use shape's size.
         gl.glScalef(sizeXY / MINIMUM_RADIUS, sizeXY / MINIMUM_RADIUS, 1.0f);
     }
+    @Override
+    protected  void invertScale(GL10 gl){
+        gl.glScalef( MINIMUM_RADIUS/sizeXY, MINIMUM_RADIUS/sizeXY, 1.0f);
+    }
 }

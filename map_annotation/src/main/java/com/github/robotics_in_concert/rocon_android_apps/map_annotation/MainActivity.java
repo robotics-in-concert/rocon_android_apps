@@ -13,13 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-
 package com.github.robotics_in_concert.rocon_android_apps.map_annotation;
 
-import java.sql.Date;
-import java.text.DateFormat;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -34,36 +30,37 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 
-import map_store.MapListEntry;
-import map_store.ListMapsResponse;
-import map_store.PublishMapResponse;
-import annotations_store.SaveAnnotationsResponse;
-
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.AnnotationsList;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.AnnotationsPublisher;
-import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Marker;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Column;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Marker;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Pickup;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Table;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Wall;
+import com.github.rosjava.android_remocons.common_tools.apps.RosAppActivity;
 
-import com.github.rosjava.android_apps.application_management.RosAppActivity;
-
-import org.ros.namespace.NameResolver;
-import org.ros.node.NodeConfiguration;
-import org.ros.node.NodeMainExecutor;
-import org.ros.node.service.ServiceResponseListener;
 import org.ros.address.InetAddressFactory;
 import org.ros.android.view.visualization.VisualizationView;
 import org.ros.android.view.visualization.layer.CameraControlListener;
 import org.ros.android.view.visualization.layer.OccupancyGridLayer;
-import org.ros.exception.RemoteException;
+import org.ros.node.NodeConfiguration;
+import org.ros.node.NodeMainExecutor;
 import org.ros.time.NtpTimeProvider;
+
+import java.sql.Date;
+import java.text.DateFormat;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import map_store.MapListEntry;
+
+//import annotations_store.SaveAnnotationsResponse;
 
 /**
  * @author jorge@yujinrobot.com (Jorge Santos Simon)
  */
 public class MainActivity extends RosAppActivity {
+
 
     private VisualizationView mapView;
     private Button backButton;
@@ -99,7 +96,8 @@ public class MainActivity extends RosAppActivity {
         String defaultRobotName = getString(R.string.default_robot);
         String defaultAppName = getString(R.string.default_app);
         // TODO nonsense setDefaultRobotName(defaultRobotName);
-        setDefaultAppName(defaultAppName);
+        //setDefaultAppName(defaultAppName);
+        setDefaultMasterName(getString(R.string.default_robot));
         setDashboardResource(R.id.top_bar);
         setMainWindowResource(R.layout.main);
         super.onCreate(savedInstanceState);
@@ -161,10 +159,12 @@ public class MainActivity extends RosAppActivity {
 
         annotationsPub = new AnnotationsPublisher(this, annotationsList, params, remaps);
         listView.setAdapter(annotationsList);
+
     }
 
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
+
 
         super.init(nodeMainExecutor);
         
@@ -174,6 +174,7 @@ public class MainActivity extends RosAppActivity {
 
         ViewControlLayer viewControlLayer = new ViewControlLayer(this,
                 nodeMainExecutor.getScheduledExecutorService(), mapView, params);
+
 
         viewControlLayer.addListener(new CameraControlListener() {
             @Override
@@ -199,17 +200,20 @@ public class MainActivity extends RosAppActivity {
         annotationLayer = new MapAnnotationLayer(this, annotationsList, params);
         mapView.addLayer(annotationLayer);
         NtpTimeProvider ntpTimeProvider = new NtpTimeProvider(
-                InetAddressFactory.newFromHostString("192.168.0.1"), // TODO what is this?
+                InetAddressFactory.newFromHostString("192.168.10.1"), // TODO what is this?
                 nodeMainExecutor.getScheduledExecutorService());
         ntpTimeProvider.startPeriodicUpdates(1, TimeUnit.MINUTES);
         nodeConfiguration.setTimeProvider(ntpTimeProvider);
         nodeMainExecutor.execute(mapView, nodeConfiguration.setNodeName("android/map_view"));
 
+        annotationsPub.setMasterNameSpace(getMasterNameSpace());
         nodeMainExecutor.execute(annotationsPub, nodeConfiguration.setNodeName("android/annotations_pub"));
 
-        readAvailableMapList();
+        Log.i("[MA]", "[MainActivity][Init] Remappings+masterns: " + getMasterNameSpace().resolve(remaps.get("ar_markers")).toString());
+        Log.i("[MA]", "[MainActivity][Init] Remappings+masterns: " + getMasterNameSpace().resolve(remaps.get("save_ar_markers")).toString());
+        Log.i("[MA]", "[MainActivity][Init] Remappings: " + remaps.get("ar_markers"));
+        Log.i("[MA]", "[MainActivity][Init] Remappings: " + remaps.get("save_ar_markers"));
     }
-
     private void onChooseMapButtonPressed() {
         readAvailableMapList();
     }
@@ -235,29 +239,6 @@ public class MainActivity extends RosAppActivity {
     }
 
     private void readAvailableMapList() {
-        safeShowWaitingDialog("Waiting...", "Waiting for map list");
-
-        DatabaseManager databaseManager = new DatabaseManager(this, remaps);
-        databaseManager.setNameResolver(getMasterNameSpace());
-        databaseManager.setFunction("list");
-        safeShowWaitingDialog("Waiting...", "Waiting for map list");
-        databaseManager.setListService(new ServiceResponseListener<ListMapsResponse>() {
-                    @Override
-                    public void onSuccess(ListMapsResponse message) {
-                        Log.i("MapAnn", "readAvailableMapList() Success");
-                        safeDismissWaitingDialog();
-                        showMapListDialog(message.getMapList());
-                    }
-
-                    @Override
-                    public void onFailure(RemoteException e) {
-                        Log.i("MapAnn", "readAvailableMapList() Failure");
-                        safeDismissWaitingDialog();
-                    }
-                });
-
-        nodeMainExecutor.execute(databaseManager,
-                nodeConfiguration.setNodeName("android/list_maps"));
     }
 
     /**
@@ -302,63 +283,9 @@ public class MainActivity extends RosAppActivity {
     }
 
     private void loadMap(MapListEntry mapListEntry) {
-
-        DatabaseManager databaseManager = new DatabaseManager(this, remaps);
-        databaseManager.setNameResolver(getMasterNameSpace());
-        databaseManager.setFunction("publish");
-        databaseManager.setMapId(mapListEntry.getMapId());
-
-        safeShowWaitingDialog("Waiting...", "Loading map");
-        try {
-            databaseManager
-                    .setPublishService(new ServiceResponseListener<PublishMapResponse>() {
-                        @Override
-                        public void onSuccess(PublishMapResponse message) {
-                            Log.i("MapAnn", "loadMap() Success");
-                            safeDismissWaitingDialog();
-                        }
-
-                        @Override
-                        public void onFailure(RemoteException e) {
-                            Log.i("MapAnn", "loadMap() Failure");
-                            safeDismissWaitingDialog();
-                        }
-                    });
-        } catch (Throwable ex) {
-            Log.e("MapAnn", "loadMap() caught exception.", ex);
-            safeDismissWaitingDialog();
-        }
-        nodeMainExecutor.execute(databaseManager,
-                nodeConfiguration.setNodeName("android/publish_map"));
     }
 
     public void saveAnnotations(View view) {
-        DatabaseManager databaseManager = new DatabaseManager(this, remaps);
-        databaseManager.setNameResolver(getMasterNameSpace());
-        databaseManager.setFunction("save");
-        databaseManager.setMap(currentMap);
-
-        safeShowWaitingDialog("Waiting...", "Saving annotations");
-        try {
-            databaseManager.setSaveService(new ServiceResponseListener<SaveAnnotationsResponse>() {
-                        @Override
-                        public void onSuccess(SaveAnnotationsResponse message) {
-                            Log.i("MapAnn", "Save annotations success");
-                            safeDismissWaitingDialog();
-                        }
-
-                        @Override
-                        public void onFailure(RemoteException e) {
-                            Log.i("MapAnn", "Save annotations failure");
-                            safeDismissWaitingDialog();
-                        }
-                    });
-        } catch (Throwable ex) {
-            Log.e("MapAnn", "Save annotations caught exception.", ex);
-            safeDismissWaitingDialog();
-        }
-        nodeMainExecutor.execute(databaseManager,
-                nodeConfiguration.setNodeName("android/save_annotations"));
     }
 
     private void safeDismissChooseMapDialog() {

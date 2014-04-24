@@ -1,8 +1,6 @@
 
 package com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +11,14 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.R;
-import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.*;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Annotation;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Column;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Marker;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Pickup;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Table;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Wall;
+
+import java.util.ArrayList;
 
 public class AnnotationsList extends BaseExpandableListAdapter {
 
@@ -62,7 +67,6 @@ public class AnnotationsList extends BaseExpandableListAdapter {
         else {
             children.get(index).add(annotation);
             notifyDataSetChanged();
-
             listView.expandGroup(index);
         }
     }

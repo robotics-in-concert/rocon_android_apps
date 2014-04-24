@@ -16,24 +16,29 @@
 
 package com.github.robotics_in_concert.rocon_android_apps.map_annotation;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.AnnotationsList;
-import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.*;
-import com.github.rosjava.android_apps.application_management.rapp_manager.AppParameters;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Annotation;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Column;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Marker;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Pickup;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Table;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Wall;
+import com.github.rosjava.android_remocons.common_tools.apps.AppParameters;
 import com.google.common.base.Preconditions;
 
 import org.ros.android.view.visualization.Camera;
@@ -46,6 +51,8 @@ import org.ros.node.Node;
 import org.ros.rosjava_geometry.FrameTransformTree;
 import org.ros.rosjava_geometry.Transform;
 import org.ros.rosjava_geometry.Vector3;
+
+import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -85,22 +92,28 @@ public class MapAnnotationLayer extends DefaultLayer {
         this.mode = mode;
     }
 
+    private static final ThreadLocal<FloatBuffer> buffer = new ThreadLocal<FloatBuffer>() {
+        @Override
+        protected FloatBuffer initialValue() {
+            return FloatBuffer.allocate(16);
+        };
+
+        @Override
+        public FloatBuffer get() {
+            FloatBuffer buffer = super.get();
+            buffer.clear();
+            return buffer;
+        };
+    };
+
     @Override
     public void draw(GL10 gl) {
         // Draw currently creating annotation
         if (annotation != null) {
             annotation.draw(gl);
         }
-//        if (origin_shape != null) {  TODO  create tf ref shape   maybe add a layer   also, the map appear rotated 90 deg; why???
-//            origin_shape.setTransform(Transform.identity());
-//            origin_shape.draw(gl);
-//        }
-//        if (camera_shape != null) {
-//            camera_shape.setTransform(camera.transform);
-//            camera_shape.draw(gl);
-//        }
-        // Draw already created annotations
-        for (Annotation annotation : annotationsList.listFullContent()) {
+        //Draw already created annotations
+        for (Annotation annotation: annotationsList.listFullContent()) {
             annotation.draw(gl);
         }
     }
@@ -124,6 +137,7 @@ public class MapAnnotationLayer extends DefaultLayer {
             Vector3 pointerVector;
 
             if (event.getAction() == MotionEvent.ACTION_MOVE) {
+
                 poseVector = pose.apply(Vector3.zero());
                 pointerVector = camera.toMetricCoordinates((int) event.getX(), (int) event.getY());
 
@@ -140,7 +154,7 @@ public class MapAnnotationLayer extends DefaultLayer {
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 confirmAnnotation();
                 return true;
-            }
+           }
         }
         gestureDetector.onTouchEvent(event);
         return false;
@@ -149,7 +163,6 @@ public class MapAnnotationLayer extends DefaultLayer {
     @Override
     public void onStart(ConnectedNode connectedNode, Handler handler,
                         FrameTransformTree frameTransformTree, final Camera camera) {
-        this.connectedNode = connectedNode;
         this.camera = camera;
         this.camera.setFrame((String) params.get("map_frame", context.getString(R.string.map_frame)));
         this.origin_shape = new PoseShape(camera);
@@ -163,9 +176,7 @@ public class MapAnnotationLayer extends DefaultLayer {
                         new GestureDetector.SimpleOnGestureListener() {
                             @Override
                             public void onLongPress(MotionEvent e) {
-                                pose = Transform.translation(camera.toMetricCoordinates(
-                                        (int) e.getX(), (int) e.getY()));
-
+                                pose = Transform.translation(camera.toMetricCoordinates((int) e.getX(), (int) e.getY()));
                                 switch (mode) {
                                     case ADD_MARKER:
                                         annotation = new Marker("marker 1");
@@ -185,11 +196,9 @@ public class MapAnnotationLayer extends DefaultLayer {
                                     default:
                                         Log.e("MapAnn", "Unimplemented annotation mode: " + mode);
                                 }
-                                annotation.setTransform(Transform.translation(
-                                        camera.toMetricCoordinates((int) e.getX(), (int) e.getY())));
 
-                                fixedPose = Transform.translation(camera.toMetricCoordinates(
-                                        (int) e.getX(), (int) e.getY()));
+                                annotation.setTransform(pose);
+                                //fixedPose = Transform.translation(camera.toMetricCoordinates((int) e.getX(), (int) e.getY()));
                             }
                         });
             }
@@ -220,7 +229,7 @@ public class MapAnnotationLayer extends DefaultLayer {
             height_label.setVisibility(View.GONE);  // have no height
         }
 
-        // Setup a dialog window
+        // Setup a dialog windowAnnotation
         alertDialogBuilder.setCancelable(false);
         alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {

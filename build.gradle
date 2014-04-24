@@ -15,11 +15,13 @@
  */
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.8'
+    gradleVersion = '1.11'
 }
 
 buildscript {
     def rosMavenPath = "$System.env.ROS_MAVEN_PATH".split(':').collect { 'file://' + it }
+    def rosMavenRepository = "$System.env.ROS_MAVEN_REPOSITORY"
+    
     repositories {
         rosMavenPath.each { p ->
             maven {
@@ -28,7 +30,7 @@ buildscript {
         }
         mavenLocal()
         maven {
-            url 'https://github.com/rosjava/rosjava_mvn_repo/raw/master'
+            url rosMavenRepository
         }
     }
     dependencies {
@@ -39,11 +41,12 @@ buildscript {
 apply plugin: 'catkin'
 
 allprojects {
-    group 'com.github.robotics_in_concert.rocon_android'
+    group 'com.github.robotics_in_concert.rocon_android_apps'
     version = project.catkin.pkg.version
 }
 
 subprojects {
     apply plugin: 'ros-android'
 }
-                                                   
+
+defaultTasks 'assembleRelease'
