@@ -4,14 +4,15 @@ import org.ros.android.view.visualization.Color;
 import org.ros.rosjava_geometry.Transform;
 import org.ros.rosjava_geometry.Vector3;
 
+
 public class Marker extends Annotation {
     public static final String GROUP_NAME = "AR Markers";
 
-    private static final Color COLOR = Color.fromHexAndAlpha("0af0f0", 0.8f);
+    private static final Color COLOR = Color.fromHexAndAlpha("0afaf0", 0.8f);
     private static final float VERTICES[] = {
-            -0.03f, -0.4f, 0.0f,
-             0.04f,  0.0f, 0.0f,
-            -0.03f,  0.4f, 0.0f
+            -0.2f, -0.2f, 0.0f,
+             0.4f,  0.0f, 0.0f,
+            -0.2f,  0.2f, 0.0f
     };
 
     private int id; // AR maker unique id
@@ -39,4 +40,5 @@ public class Marker extends Annotation {
         // Markers have fixed size and are 3D-located, so height represents is z-coordinate
         this.setTransform(this.getTransform().multiply(Transform.translation(new Vector3(0.0, 0.0, height))));
     }
+
 }
