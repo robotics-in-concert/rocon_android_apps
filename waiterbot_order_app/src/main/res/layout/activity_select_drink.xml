@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="1"
+    android:clickable="false"
+    android:background="#ffffff">
+
+    <Button
+        android:layout_width="45dp"
+        android:layout_height="60dp"
+        android:id="@+id/show_log"
+        android:layout_gravity="right"
+        android:layout_alignParentRight="true"
+        android:maxLines="300"
+        android:background="@drawable/rocon_image"
+        android:layout_margin="10dp" />
+
+    <TextView
+        android:layout_width="600dp"
+        android:layout_height="800dp"
+        android:id="@+id/log"
+        android:layout_gravity="right"
+        android:textSize="15dp"
+        android:visibility="invisible"
+        android:maxLines="30"
+        android:text="123123\n123123\n123123\n123123\n123123\n" />
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="340dp"
+        android:layout_below="@+id/linearLayout2"
+        android:layout_alignParentLeft="true"
+        android:layout_above="@id/waiterbot_debug">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.69"
+            android:clickable="false">
+
+            <Button
+                android:layout_width="900dp"
+                android:layout_height="50dp"
+                android:id="@+id/order"
+                android:textSize="60dp"
+                android:background="@drawable/button"
+                android:textStyle="bold"
+                android:text="Please, choose your drink."
+                android:textColor="#133f68"
+                android:layout_below="@+id/drink_2_quantity"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true" />
+
+            <Button
+                android:layout_width="200dp"
+                android:layout_height="340dp"
+                android:id="@+id/drink_2"
+                android:textSize="120dp"
+                android:background="@drawable/drink_beer"
+                android:layout_alignParentTop="true"
+                android:layout_alignRight="@+id/order"
+                android:layout_marginRight="128dp" />
+
+            <Button
+                android:layout_width="200dp"
+                android:layout_height="340dp"
+                android:id="@+id/drink_1"
+                android:textSize="130dp"
+                android:clickable="false"
+                android:background="@drawable/drink_coke"
+                android:layout_marginLeft="128dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignLeft="@+id/order" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/drink_2_quantity"
+                android:textSize="120dp"
+                android:gravity="center"
+                android:textColor="#419df0"
+                android:layout_below="@+id/drink_2"
+                android:layout_alignLeft="@+id/drink_2"
+                android:layout_alignRight="@+id/drink_2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/drink_1_quantity"
+                android:textSize="130dp"
+                android:gravity="center"
+                android:textColor="#419df0"
+                android:layout_alignBottom="@+id/drink_2_quantity"
+                android:layout_alignLeft="@+id/drink_1"
+                android:layout_alignRight="@+id/drink_1" />
+
+        </RelativeLayout>
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="0dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="0dp"
+        android:id="@+id/linearLayout2"
+        android:baselineAligned="false">
+
+        <TextView
+            android:layout_width="400dp"
+            android:layout_height="fill_parent"
+            android:text="[robot: ][laptop: ]"
+            android:id="@+id/battery_status"
+            android:textSize="20dp"
+            android:gravity="fill_vertical"
+            android:textColor="#4196df"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:text="IDLE"
+        android:id="@id/waiterbot_debug"
+        android:textSize="20dp"
+        android:gravity="left|fill_vertical"
+        android:layout_weight="0.22"
+        android:clickable="false"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" />
+
+</RelativeLayout>
+
