@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Marcus Liebhardt
+ * Copyright (C) 2013 Daniel Stonier.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -14,11 +14,20 @@
  * the License.
  */
 
-/* Uncomment these and add your own packages to be gradled
-include 'my_android_project'
-include 'my_android_library_project'
-*/
-//include 'motion_retargeting'
-//include 'map_annotation'
-include 'waiterbot_order_app'
-//include 'concert_teleop'
+dependencies {
+    compile 'org.ros.android_core:android_honeycomb_mr2:[0.1,0.2)'
+    compile 'com.github.rosjava.android_remocons:common_tools:[0.1,0.2)'
+}
+
+apply plugin: 'android'
+
+android {
+    compileSdkVersion 15
+    packagingOptions {
+        /* https://github.com/rosjava/android_core/issues/194 */
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
+}
+defaultTasks 'assembleRelease'

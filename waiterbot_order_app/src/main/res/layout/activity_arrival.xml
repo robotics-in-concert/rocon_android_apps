@@ -1,0 +1,91 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.ArrivalActivity"
+    tools:ignore="MergeRootFrame"
+    android:background="#ffffff">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true">
+
+        <TextView
+            android:layout_width="400dp"
+            android:layout_height="fill_parent"
+            android:id="@+id/battery_status"
+            android:gravity="fill_vertical"
+            android:textColor="#419df6"
+            android:textStyle="bold"
+            android:textSize="20dp"
+            android:text="[robot: ][laptop: ]" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="600dp"
+        android:layout_gravity="center"
+        android:weightSum="1"
+        android:id="@+id/linearLayout"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enjoy your drink."
+            android:id="@+id/status"
+            android:textSize="120dp"
+            android:textIsSelectable="false"
+            android:gravity="center"
+            android:layout_weight="0.47"
+            android:textColor="#419dff"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/status_description"
+            android:gravity="center"
+            android:text="Please, press the green button."
+            android:textSize="60dp"
+            android:layout_weight="0.11"
+            android:textColor="#419df0" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:text="@string/waiterbot_debug"
+        android:id="@+id/waiterbot_debug"
+        android:textSize="20dp"
+        android:gravity="fill_vertical"
+        android:layout_weight="0.06"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" />
+
+    <TextView
+        android:layout_width="600dp"
+        android:layout_height="400dp"
+        android:id="@+id/log"
+        android:textSize="15dp"
+        android:visibility="invisible"
+        android:maxLines="300" />
+
+    <Button
+        android:layout_width="45dp"
+        android:layout_height="60dp"
+        android:id="@+id/show_log"
+        android:layout_gravity="right"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/rocon_image"
+        android:layout_margin="10dp" />
+
+</RelativeLayout>

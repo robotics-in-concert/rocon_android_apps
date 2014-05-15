@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Application Management -->
+    <string name="app_name">CesDemoOrderApp</string>
+    <string name="paired_app_name">ces_rapps/waiter_isolated</string>
+    <!-- <string name="paired_app_name">ces_rapps/dummy_waiter</string>-->
+    <string name="default_robot">whoola</string>
+
+    <!-- Menu options -->
+    <string name="stop_app">Stop Application</string>
+
+    <!-- Topics and services -->
+    <string name="title_activity_select_drink">SelectDrinkActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Publisher -->
+    <string name="drink_order_topic">drink_order</string>
+
+    <!-- Subscriber -->
+    <string name="drink_ar_topic">drink_ar</string>
+    <string name="drinks_dispensed_topic">drinks_dispensed</string>
+    <string name="waiterbot_debug_topic">waiterbot_debug</string>
+    <string name="tray_empty_topic">tray_empty</string>
+    <string name="order_cancelled_topic">order_cancelled</string>
+
+    <!-- Layout -->
+    <string name="title_activity_armaker">ARMakerActivity</string>
+    <string name="title_activity_armarker">ARMarkerActivity</string>
+    <string name="title_activity_arrival">ArrivalActivity</string>
+
+    <!-- Topics and services -->
+    <string name="drink_1_name">Drink1</string>
+    <string name="drink_2_name">Drink2</string>
+    <string name="waiterbot_debug">IDLE</string>
+    <string name="title_activity_status">StatusActivity</string>
+
+</resources>
