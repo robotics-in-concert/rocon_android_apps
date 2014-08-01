@@ -34,8 +34,8 @@ import android.widget.Toast;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.AnnotationsList;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Annotation;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Column;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Location;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Marker;
-import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Pickup;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Table;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Wall;
 import com.github.rosjava.android_remocons.common_tools.apps.AppParameters;
@@ -78,7 +78,7 @@ public class MapAnnotationLayer extends DefaultLayer {
     private AppParameters params;
 
     public enum Mode {
-        ADD_MARKER, ADD_TABLE, ADD_COLUMN, ADD_WALL, ADD_PICKUP
+        ADD_MARKER, ADD_TABLE, ADD_COLUMN, ADD_WALL, ADD_LOCATION
     }
 
     public MapAnnotationLayer(final Context context, final AnnotationsList annotationsList,
@@ -190,8 +190,8 @@ public class MapAnnotationLayer extends DefaultLayer {
                                     case ADD_WALL:
                                         annotation = new Wall("Wall 1");
                                         break;
-                                    case ADD_PICKUP:
-                                        annotation = new Pickup("Pickup 1");
+                                    case ADD_LOCATION:
+                                        annotation = new Location("Location 1");
                                         break;
                                     default:
                                         Log.e("MapAnn", "Unimplemented annotation mode: " + mode);
@@ -224,10 +224,6 @@ public class MapAnnotationLayer extends DefaultLayer {
         // Customize for some slightly exotic annotations
         if (mode == Mode.ADD_MARKER)                // Marker name must be its id, a positive integer
             name_edit.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        if (mode == Mode.ADD_PICKUP) {
-            height_edit.setVisibility(View.GONE);   // Pickup points
-            height_label.setVisibility(View.GONE);  // have no height
-        }
 
         // Setup a dialog windowAnnotation
         alertDialogBuilder.setCancelable(false);
@@ -261,12 +257,6 @@ public class MapAnnotationLayer extends DefaultLayer {
         // Create and show an alert dialog to get annotation info
         final AlertDialog alertDlg = alertDialogBuilder.create();
         alertDlg.show();
-
-        // Ensure that both fields contain something before enabling OK; however, pickups can have a default value
-        if ((mode == Mode.ADD_PICKUP) && (params.containsKey("pickup_point") == true))
-            name_edit.append(params.get("pickup_point").toString());
-        else
-            alertDlg.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
 
         name_edit.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {

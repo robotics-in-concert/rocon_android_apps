@@ -33,8 +33,8 @@ import android.widget.ExpandableListView;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.AnnotationsList;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.AnnotationsPublisher;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Column;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Location;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Marker;
-import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Pickup;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Table;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Wall;
 import com.github.rosjava.android_remocons.common_tools.apps.RosAppActivity;
@@ -152,7 +152,7 @@ public class MainActivity extends RosAppActivity {
 
         // TODO use reflection to take all classes on annotations package except Annotation
         annotationsList.addGroup(new Marker(""));
-        annotationsList.addGroup(new Pickup(""));
+        annotationsList.addGroup(new Location(""));
         annotationsList.addGroup(new Table(""));
         annotationsList.addGroup(new Column(""));
         annotationsList.addGroup(new Wall(""));
@@ -234,8 +234,8 @@ public class MainActivity extends RosAppActivity {
         annotationLayer.setMode(MapAnnotationLayer.Mode.ADD_TABLE);
     }
 
-    public void addPickupClicked(View view) {
-        annotationLayer.setMode(MapAnnotationLayer.Mode.ADD_PICKUP);
+    public void addLocationClicked(View view) {
+        annotationLayer.setMode(MapAnnotationLayer.Mode.ADD_LOCATION);
     }
 
     private void readAvailableMapList() {

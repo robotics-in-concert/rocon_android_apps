@@ -25,7 +25,7 @@ public class MockDataProvider {
                 annotation = new Table(name);
                 break;
             case 4:
-                annotation = new Pickup(name);
+                annotation = new Location(name);
                 break;
         }
         return annotation;

@@ -26,8 +26,8 @@ import android.widget.Toast;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.R;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Annotation;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Column;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Location;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Marker;
-import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Pickup;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Table;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Wall;
 import com.github.rosjava.android_remocons.common_tools.apps.AppParameters;
@@ -50,8 +50,8 @@ import org.ros.rosjava_geometry.Quaternion;
 import org.ros.rosjava_geometry.Transform;
 import org.ros.rosjava_geometry.Vector3;
 
-import ar_track_alvar.AlvarMarker;
-import ar_track_alvar.AlvarMarkers;
+import ar_track_alvar_msgs.AlvarMarker;
+import ar_track_alvar_msgs.AlvarMarkers;
 import simple_annotation_msgs.SaveARMarkers;
 import simple_annotation_msgs.SaveARMarkersRequest;
 import simple_annotation_msgs.SaveARMarkersResponse;
@@ -200,15 +200,14 @@ public class AnnotationsPublisher extends DataSetObserver implements NodeMain {
                 table.getTransform().toPoseMessage(annMsg.getPose().getPose().getPose());
                 tablesMsg.getTables().add(annMsg);
             }
-            else if (ann.getGroup().equals(Pickup.GROUP_NAME)) {
-                // Pickup; as legacy from our first demo, pickup points are tables; mmm.... sucks! TODO
-                Pickup pickup = (Pickup)ann;
+            else if (ann.getGroup().equals(Location.GROUP_NAME)) {
+
+                Location location = (Location)ann;
                 yocs_msgs.Table annMsg = messageFactory.newFromType(yocs_msgs.Table._TYPE);
-                annMsg.setName(pickup.getName());
-                annMsg.setHeight(pickup.getHeight());
-                annMsg.setRadius(pickup.getRadius());
+                annMsg.setName(location.getName());
+                annMsg.setHeight(location.getHeight());
                 annMsg.getPose().getHeader().setFrameId(mapFrame);
-                pickup.getTransform().toPoseMessage(annMsg.getPose().getPose().getPose());
+                location.getTransform().toPoseMessage(annMsg.getPose().getPose().getPose());
                 tablesMsg.getTables().add(annMsg);
             }
             else {
@@ -330,7 +329,7 @@ public class AnnotationsPublisher extends DataSetObserver implements NodeMain {
             save_wall_srvClient = connectedNode.newServiceClient(walls_serviceName, SaveWalls._TYPE);
         } catch (ServiceNotFoundException e) {
             Log.w("MapAnn", "Request service not found");
-            Toast.makeText(this.context,"Request service not found", Toast.LENGTH_LONG).show();
+            Toast.makeText(this.context, "Request service not found", Toast.LENGTH_LONG).show();
             return;
             //throw new RosRuntimeException(e); // TODO we should recover from this calling onFailure on listener
         }

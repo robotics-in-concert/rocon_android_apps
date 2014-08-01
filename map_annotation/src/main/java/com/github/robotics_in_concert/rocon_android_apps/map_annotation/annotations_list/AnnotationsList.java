@@ -13,8 +13,8 @@ import android.widget.TextView;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.R;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Annotation;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Column;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Location;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Marker;
-import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Pickup;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Table;
 import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Wall;
 
@@ -102,8 +102,8 @@ public class AnnotationsList extends BaseExpandableListAdapter {
             tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.wall, 0, 0, 0);
         } else if (annotation instanceof Marker) {
             tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.marker, 0, 0, 0);
-        } else if (annotation instanceof Pickup) {
-            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pickup, 0, 0, 0);
+        } else if (annotation instanceof Location) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.location, 0, 0, 0);
         } else if (annotation instanceof Table) {
             tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.table, 0, 0, 0);
         }
@@ -142,21 +142,21 @@ public class AnnotationsList extends BaseExpandableListAdapter {
         }
         TextView tv = (TextView) convertView.findViewById(R.id.tvGroup);
         tv.setText(group);
-//        tv.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-//        if (group.equalsIgnoreCase("Virtual Columns")) {
-//            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.column, 0, 0, 0);
-//            tv.setHeight(120);
-//        } else if (group.equalsIgnoreCase("Virtual Walls")) {
-//            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.wall, 0, 0, 0);
-//            tv.setHeight(80);
-//        } else if (group.equalsIgnoreCase("AR Markers")) {
-//            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.marker, 0, 0, 0);
-//            tv.setHeight(50);
-//        } else if (group.equalsIgnoreCase("Pickup Points")) {
-//            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.pickup, 0, 0, 0);
-//        } else if (group.equalsIgnoreCase("Tables")) {
-//            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.table, 0, 0, 0);
-//        }
+        tv.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+        if (group.equalsIgnoreCase("Virtual Columns")) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.column, 0, 0, 0);
+            tv.setHeight(120);
+        } else if (group.equalsIgnoreCase("Virtual Walls")) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.wall, 0, 0, 0);
+            tv.setHeight(80);
+        } else if (group.equalsIgnoreCase("AR Markers")) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.marker, 0, 0, 0);
+            tv.setHeight(50);
+        } else if (group.equalsIgnoreCase("Location Points")) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.location, 0, 0, 0);
+        } else if (group.equalsIgnoreCase("Tables")) {
+            tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.table, 0, 0, 0);
+        }
 
         return convertView;
     }

@@ -78,10 +78,10 @@
             <RadioButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add pickup point"
-                android:id="@+id/add_pickup_point"
+                android:text="Add location point"
+                android:id="@+id/add_location_point"
                 android:layout_marginLeft="10dp"
-                android:onClick="addPickupClicked" />
+                android:onClick="addLocationClicked" />
 
             <LinearLayout
                 android:id="@+id/top_bar"
