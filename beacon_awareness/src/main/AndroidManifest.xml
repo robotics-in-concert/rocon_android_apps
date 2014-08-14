@@ -37,7 +37,7 @@
         </intent-filter>
     </service>
 
-    <service android:name="WizTurnBeacon">
+    <service android:name=".WizTurnBeaconService">
         <intent-filter>
             <action android:name="arabiannight.tistory.com.service"/>
             <category android:name="android.intent.category.DEFAULT"/>

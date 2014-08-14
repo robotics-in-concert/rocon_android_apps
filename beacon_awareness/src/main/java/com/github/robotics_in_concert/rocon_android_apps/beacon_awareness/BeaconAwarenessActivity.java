@@ -1,7 +1,11 @@
 package com.github.robotics_in_concert.rocon_android_apps.beacon_awareness;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -9,7 +13,6 @@ import android.widget.Toast;
 import com.github.rosjava.android_remocons.common_tools.apps.RosAppActivity;
 
 import org.ros.android.view.RosTextView;
-import org.ros.internal.message.RawMessage;
 import org.ros.namespace.GraphName;
 import org.ros.node.ConnectedNode;
 import org.ros.node.Node;
@@ -25,11 +28,34 @@ public class BeaconAwarenessActivity extends RosAppActivity implements View.OnCl
     private Toast lastToast;
     private RosTextView<std_msgs.String> rosTextView;
     BeaconAwarenessNode ba_bridge;
+    public WizTurnBeaconService wt_service;
+
     public BeaconAwarenessActivity()
     {
         super("BeaconAwareness", "BeaconAwareness");
     }
 
+    private boolean is_bound = false;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d("BeaconAwareness", "Beacon Service connection!!!");
+            wt_service = ((WizTurnBeaconService.WizTurnBeaconServiceBinder)service).getService();
+            wt_service.registerCallback(mCallback);
+            is_bound = true;
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d("BeaconAwareness", "Beacon Service disconnection!!!");
+            wt_service = null;
+            is_bound = false;
+        }
+        private WizTurnBeaconService.ICallback mCallback = new WizTurnBeaconService.ICallback() {
+            public void sendData(String data) {
+            ba_bridge.publish(data);
+            }
+        };
+    };
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -37,6 +63,7 @@ public class BeaconAwarenessActivity extends RosAppActivity implements View.OnCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         findViewById(R.id.srv_start).setOnClickListener(this);
+        findViewById(R.id.srv_stop).setOnClickListener(this);
     }
 
     @Override
@@ -65,11 +92,17 @@ public class BeaconAwarenessActivity extends RosAppActivity implements View.OnCl
         switch(v.getId()){
             case R.id.srv_start:
                 Log.d("[BeaconAwareness]", "push srv_start");
-                startService(new Intent(BeaconAwarenessActivity.this,WizTurnBeacon.class));
+                //startService(new Intent(BeaconAwarenessActivity.this,WizTurnBeaconService.class));
+                Intent intent = new Intent(this, WizTurnBeaconService.class);
+                bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
                 break;
             case R.id.srv_stop:
-                Log.d("[BeaconAwareness]", "push srv_start");
-                stopService(new Intent(BeaconAwarenessActivity.this,WizTurnBeacon.class));
+                Log.d("[BeaconAwareness]", "push srv_stop");
+                if (is_bound) {
+                    unbindService(mConnection);
+                    is_bound= false;
+                }
                 break;
             default:
                 break;
@@ -86,20 +119,7 @@ public class BeaconAwarenessActivity extends RosAppActivity implements View.OnCl
 
         void publish (String data){
             if(publisher != null){
-                std_msgs.String beacons = new std_msgs.String() {
-                    @Override
-                    public String getData() {
-                        return null;
-                    }
-                    @Override
-                    public void setData(String s) {
-
-                    }
-                    @Override
-                    public RawMessage toRawMessage() {
-                        return null;
-                    }
-                };
+                std_msgs.String beacons = publisher.newMessage();
                 beacons.setData(data);
                 publisher.publish(beacons);
             }
