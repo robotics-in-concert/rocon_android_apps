@@ -1,3 +1,4 @@
+include ':beacon_awareness_ex'
 /*
  * Copyright (C) 2013 Marcus Liebhardt
  *
