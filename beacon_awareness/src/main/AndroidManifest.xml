@@ -3,7 +3,7 @@
           package="com.github.robotics_in_concert.rocon_android_apps.beacon_awareness"
           xmlns:tools="http://schemas.android.com/tools"
           android:versionCode="1"
-          android:versionName="0.1" >
+          android:versionName="0.1.0" >
 
     <uses-sdk android:minSdkVersion="18"
         android:targetSdkVersion="18"/>
