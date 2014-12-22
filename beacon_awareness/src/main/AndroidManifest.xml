@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.github.robotics_in_concert.rocon_android_apps.beacon_awareness"
-          xmlns:tools="http://schemas.android.com/tools">
+          xmlns:tools="http://schemas.android.com/tools"
+          android:versionCode="1"
+          android:versionName="0.1" >
 
     <uses-sdk android:minSdkVersion="18"
         android:targetSdkVersion="18"/>
