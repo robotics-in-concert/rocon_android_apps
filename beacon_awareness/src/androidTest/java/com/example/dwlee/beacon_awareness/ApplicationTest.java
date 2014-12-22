@@ -1,4 +1,4 @@
-package com.example.dwlee.beacon_awareness_ex;
+package com.example.dwlee.beacon_awareness;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
