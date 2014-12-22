@@ -32,22 +32,22 @@ public class ArrivalActivity extends Activity {
         setContentView(R.layout.activity_arrival);
 
         IntentFilter pkgFilter = new IntentFilter();
-        pkgFilter.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.CesDemoOrderApp.end_signal");
+        pkgFilter.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.WaiterbotOrderApp.end_signal");
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d("CES_DEMO", "[ArrivalActivity][BroadcastReceiver]: end signal ");
+                Log.d("WAITERBOT_ORDER_APP", "[ArrivalActivity][BroadcastReceiver]: end signal ");
                 finish();
             }
         };
         registerReceiver(mBroadcastReceiver,pkgFilter);
 
         IntentFilter pkgFilter_debug = new IntentFilter();
-        pkgFilter_debug.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.CesDemoOrderApp.waiterbot_debug");
+        pkgFilter_debug.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.WaiterbotOrderApp.waiterbot_debug");
         mBroadcastReceiver_debug = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d("CES_DEMO", "[ArrivalActivity][BroadcastReceiver_debug]: end signal ");
+                Log.d("WAITERBOT_ORDER_APP", "[ArrivalActivity][BroadcastReceiver_debug]: end signal ");
                 if (intent.getStringExtra("data") != null){
                     TextView waiterbot_debug_tv = (TextView)findViewById(R.id.waiterbot_debug);
                     waiterbot_debug_tv.setText(intent.getStringExtra("data"));
@@ -61,7 +61,7 @@ public class ArrivalActivity extends Activity {
         registerReceiver(mBroadcastReceiver_debug,pkgFilter_debug);
 
         IntentFilter pkgFilter_battery_status = new IntentFilter();
-        pkgFilter_battery_status.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.CesDemoOrderApp.battery_status");
+        pkgFilter_battery_status.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.WaiterbotOrderApp.battery_status");
         mBroadcastReceiver_battery_status = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -87,7 +87,7 @@ public class ArrivalActivity extends Activity {
         TextView status_description_tv = (TextView)findViewById(R.id.status_description);
         status_description_tv.setText(strStatusDescription);
 
-        if (CesDemoOrderApp.m_bIsLogging == true){
+        if (WaiterbotOrderApp.m_bIsLogging == true){
             TextView log_tv = (TextView)findViewById(R.id.log);
             log_tv.setVisibility(View.VISIBLE);
 
@@ -102,14 +102,14 @@ public class ArrivalActivity extends Activity {
             //intent = new Intent(SelectDrinkActivity.this, ARMarkerActivity.class);
             switch (v.getId()) {
                 case R.id.show_log:
-                    if (CesDemoOrderApp.m_bIsLogging == true){
-                        CesDemoOrderApp.m_bIsLogging = false;
+                    if (WaiterbotOrderApp.m_bIsLogging == true){
+                        WaiterbotOrderApp.m_bIsLogging = false;
                         TextView log_tv = (TextView)findViewById(R.id.log);
                         log_tv.setVisibility(View.INVISIBLE);
 
                     }
                     else{
-                        CesDemoOrderApp.m_bIsLogging = true;
+                        WaiterbotOrderApp.m_bIsLogging = true;
                         TextView log_tv = (TextView)findViewById(R.id.log);
                         log_tv.setVisibility(View.VISIBLE);
                     }

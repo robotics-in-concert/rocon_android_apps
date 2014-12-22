@@ -2,7 +2,7 @@
 <resources>
 
     <!-- Application Management -->
-    <string name="app_name">CesDemoOrderApp</string>
+    <string name="app_name">WaiterbotOrderApp</string>
     <string name="paired_app_name">ces_rapps/waiter_isolated</string>
     <!-- <string name="paired_app_name">ces_rapps/dummy_waiter</string>-->
     <string name="default_robot">whoola</string>
