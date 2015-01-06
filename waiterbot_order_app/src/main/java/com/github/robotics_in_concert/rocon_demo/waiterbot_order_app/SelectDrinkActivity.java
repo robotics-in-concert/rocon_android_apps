@@ -77,14 +77,14 @@ public class SelectDrinkActivity extends Activity
 
         super.onCreate(savedInstanceState);
 
-        Log.d("CES_DEMO","[SelectDrinkActivity][onCreate]: end");
+        Log.d("WAITERBOT_ORDER_APP","[SelectDrinkActivity][onCreate]: end");
 
         IntentFilter pkgFilter = new IntentFilter();
-        pkgFilter.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.CesDemoOrderApp.end_signal");
+        pkgFilter.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.WaiterbotOrderApp.end_signal");
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d("CES_DEMO", "[SelectDrinkActivity][BroadcastReceiver]: end signal ");
+                Log.d("WAITERBOT_ORDER_APP", "[SelectDrinkActivity][BroadcastReceiver]: end signal ");
 
                 Intent result_intent = new Intent ();
                 m_parent.setResult(DRINK_TYPE_UNKNOWN,result_intent);
@@ -94,7 +94,7 @@ public class SelectDrinkActivity extends Activity
         registerReceiver(mBroadcastReceiver,pkgFilter);
 
         IntentFilter pkgFilter_auto_order = new IntentFilter();
-        pkgFilter_auto_order.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.CesDemoOrderApp.auto_order");
+        pkgFilter_auto_order.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.WaiterbotOrderApp.auto_order");
 
         mBroadcastReceiver_auto_order = new BroadcastReceiver() {
             @Override
@@ -110,7 +110,7 @@ public class SelectDrinkActivity extends Activity
                         order_list[i] = 2;
                     }
                 }
-                Log.d("CES_DEMO", "[SelectDrinkActivity][BroadcastReceiver_auto_order]:"+m_count_drink_1+" "+m_count_drink_2);
+                Log.d("WAITERBOT_ORDER_APP", "[SelectDrinkActivity][BroadcastReceiver_auto_order]:"+m_count_drink_1+" "+m_count_drink_2);
                 Intent result_intent = new Intent ();
                 result_intent.putExtra("drink_list",order_list);
                 m_parent.setResult(DRINK_LIST, result_intent);
@@ -121,11 +121,11 @@ public class SelectDrinkActivity extends Activity
 
 
         IntentFilter pkgFilter_debug = new IntentFilter();
-        pkgFilter_debug.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.CesDemoOrderApp.waiterbot_debug");
+        pkgFilter_debug.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.WaiterbotOrderApp.waiterbot_debug");
         mBroadcastReceiver_debug = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                //Log.d("CES_DEMO", "[SelectDrinkActivity][BroadcastReceiver_debug]: "+ intent.getStringExtra("log"));
+                //Log.d("WAITERBOT_ORDER_APP", "[SelectDrinkActivity][BroadcastReceiver_debug]: "+ intent.getStringExtra("log"));
                 if (intent.getStringExtra("data") != null){
                     TextView waiterbot_debug_tv = (TextView)findViewById(R.id.waiterbot_debug);
                     waiterbot_debug_tv.setText(intent.getStringExtra("data"));
@@ -140,7 +140,7 @@ public class SelectDrinkActivity extends Activity
         registerReceiver(mBroadcastReceiver_debug,pkgFilter_debug);
 
         IntentFilter pkgFilter_battery_status = new IntentFilter();
-        pkgFilter_battery_status.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.CesDemoOrderApp.battery_status");
+        pkgFilter_battery_status.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.WaiterbotOrderApp.battery_status");
         mBroadcastReceiver_battery_status = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -155,7 +155,7 @@ public class SelectDrinkActivity extends Activity
         m_count_drink_1 = 0;
         m_count_drink_2 = 0;
 
-        if (CesDemoOrderApp.m_bIsLogging == true){
+        if (WaiterbotOrderApp.m_bIsLogging == true){
             TextView log_tv = (TextView)findViewById(R.id.log);
             log_tv.setVisibility(View.VISIBLE);
         }
@@ -165,7 +165,7 @@ public class SelectDrinkActivity extends Activity
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.drink_1:
-                    Log.d("CES_DEMO","[SelectDrinkActivity][setOnClickListener]: drink 1");
+                    Log.d("WAITERBOT_ORDER_APP","[SelectDrinkActivity][setOnClickListener]: drink 1");
                     m_count_drink_1 +=1;
                     if(m_count_drink_1 == 3){
                         m_count_drink_1 = 0;
@@ -181,7 +181,7 @@ public class SelectDrinkActivity extends Activity
                     break;
 
                 case R.id.drink_2:
-                    Log.d("CES_DEMO","[SelectDrinkActivity][setOnClickListener]: drink 2");
+                    Log.d("WAITERBOT_ORDER_APP","[SelectDrinkActivity][setOnClickListener]: drink 2");
                     m_count_drink_2+=1 ;
                     if(m_count_drink_2 == 3){
                         m_count_drink_2 = 0;
@@ -200,19 +200,19 @@ public class SelectDrinkActivity extends Activity
 
                     int total_order_count = m_count_drink_1+m_count_drink_2;
                     if (total_order_count == 0){
-                        Log.d("CES_DEMO","[SelectDrinkActivity][setOnClickListener]: order fail "+ (m_count_drink_1+m_count_drink_2));
+                        Log.d("WAITERBOT_ORDER_APP","[SelectDrinkActivity][setOnClickListener]: order fail "+ (m_count_drink_1+m_count_drink_2));
                         Toast err_toast = Toast.makeText(SelectDrinkActivity.this, "No order drink.\nPlease, press drink button", Toast.LENGTH_SHORT);
                         err_toast.setGravity(Gravity.CENTER,0,0);
                         err_toast.show();
                     }
                     else if (total_order_count >2){
-//                        Log.d("CES_DEMO","[SelectDrinkActivity][setOnClickListener]: order fail "+ (m_count_drink_1+m_count_drink_2));
+//                        Log.d("WAITERBOT_ORDER_APP","[SelectDrinkActivity][setOnClickListener]: order fail "+ (m_count_drink_1+m_count_drink_2));
 //                        Toast err_toast = Toast.makeText(SelectDrinkActivity.this, "Too many drink\nPlease, order under 2", Toast.LENGTH_SHORT);
 //                        err_toast.setGravity(Gravity.CENTER,0,0);
 //                        err_toast.show();
                     }
                     else{
-                        Log.d("CES_DEMO","[SelectDrinkActivity][setOnClickListener]: order "+ (m_count_drink_1+m_count_drink_2));
+                        Log.d("WAITERBOT_ORDER_APP","[SelectDrinkActivity][setOnClickListener]: order "+ (m_count_drink_1+m_count_drink_2));
                         short[] order_list = new short [m_count_drink_1+m_count_drink_2];
                         for(int i = 0 ; i <order_list.length ;i ++){
                             if (i < m_count_drink_1){
@@ -231,21 +231,21 @@ public class SelectDrinkActivity extends Activity
                     break;
 
                 case R.id.show_log:
-                    if (CesDemoOrderApp.m_bIsLogging == true){
-                        CesDemoOrderApp.m_bIsLogging = false;
+                    if (WaiterbotOrderApp.m_bIsLogging == true){
+                        WaiterbotOrderApp.m_bIsLogging = false;
                         TextView log_tv = (TextView)findViewById(R.id.log);
                         log_tv.setVisibility(View.INVISIBLE);
 
                     }
                     else{
-                        CesDemoOrderApp.m_bIsLogging = true;
+                        WaiterbotOrderApp.m_bIsLogging = true;
                         TextView log_tv = (TextView)findViewById(R.id.log);
                         log_tv.setVisibility(View.VISIBLE);
 
                     }
                     break;
                 default:
-                    Log.d("CES_DEMO","[SelectDrinkActivity][setOnClickListener]: drink 2");
+                    Log.d("WAITERBOT_ORDER_APP","[SelectDrinkActivity][setOnClickListener]: drink 2");
                     setResult(DRINK_TYPE_UNKNOWN);
                     break;
             }

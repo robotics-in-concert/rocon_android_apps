@@ -27,25 +27,25 @@ public class ARMarkerActivity extends Activity {
         setContentView(R.layout.activity_armarker);
         Intent intent = getIntent();
         m_drink_type = intent.getStringExtra("drink_type");
-        Log.d("CES_DEMO", "[ARMarkerActivity][onCreate]: drink_type: "+m_drink_type);
+        Log.d("WAITERBOT_ORDER_APP", "[ARMarkerActivity][onCreate]: drink_type: "+m_drink_type);
 
         IntentFilter pkgFilter = new IntentFilter();
-        pkgFilter.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.CesDemoOrderApp.end_signal");
+        pkgFilter.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.WaiterbotOrderApp.end_signal");
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d("CES_DEMO", "[ARMarkerActivity][BroadcastReceiver]: end signal ");
+                Log.d("WAITERBOT_ORDER_APP", "[ARMarkerActivity][BroadcastReceiver]: end signal ");
                 finish();
             }
         };
         registerReceiver(mBroadcastReceiver, pkgFilter);
 
         IntentFilter pkgFilter_debug = new IntentFilter();
-        pkgFilter_debug.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.CesDemoOrderApp.waiterbot_debug");
+        pkgFilter_debug.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.WaiterbotOrderApp.waiterbot_debug");
         mBroadcastReceiver_debug = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d("CES_DEMO", "[ARMarkerActivity][BroadcastReceiver_debug]: end signal ");
+                Log.d("WAITERBOT_ORDER_APP", "[ARMarkerActivity][BroadcastReceiver_debug]: end signal ");
                 if (intent.getStringExtra("data") != null){
                     TextView waiterbot_debug_tv = (TextView)findViewById(R.id.waiterbot_debug);
                     waiterbot_debug_tv.setText(intent.getStringExtra("data"));
@@ -59,7 +59,7 @@ public class ARMarkerActivity extends Activity {
         registerReceiver(mBroadcastReceiver_debug,pkgFilter_debug);
 
         IntentFilter pkgFilter_battery_status = new IntentFilter();
-        pkgFilter_battery_status.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.CesDemoOrderApp.battery_status");
+        pkgFilter_battery_status.addAction("com.github.robotics_in_concert.rocon_demo.waiterbot_order_app.WaiterbotOrderApp.battery_status");
         mBroadcastReceiver_battery_status = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -75,7 +75,7 @@ public class ARMarkerActivity extends Activity {
         findViewById(R.id.show_log).setOnClickListener(mClickListener);
 
 
-        if (CesDemoOrderApp.m_bIsLogging == true){
+        if (WaiterbotOrderApp.m_bIsLogging == true){
             TextView log_tv = (TextView)findViewById(R.id.log);
             log_tv.setVisibility(View.VISIBLE);
 
@@ -85,7 +85,7 @@ public class ARMarkerActivity extends Activity {
     }
 
     public void showImage(){
-        Log.d("CES_DEMO", "[ARMarkerActivity][showImage]:");
+        Log.d("WAITERBOT_ORDER_APP", "[ARMarkerActivity][showImage]:");
         ImageView iv = (ImageView)findViewById(R.id.ar_marker);
         iv.setBackgroundColor(Color.rgb(255, 255, 255));
         if (m_drink_type.equals("drink1")){ // drink 1 ar marker
@@ -109,14 +109,14 @@ public class ARMarkerActivity extends Activity {
 
             switch (v.getId()) {
                 case R.id.show_log:
-                    if (CesDemoOrderApp.m_bIsLogging == true){
-                        CesDemoOrderApp.m_bIsLogging = false;
+                    if (WaiterbotOrderApp.m_bIsLogging == true){
+                        WaiterbotOrderApp.m_bIsLogging = false;
                         TextView log_tv = (TextView)findViewById(R.id.log);
                         log_tv.setVisibility(View.INVISIBLE);
 
                     }
                     else{
-                        CesDemoOrderApp.m_bIsLogging = true;
+                        WaiterbotOrderApp.m_bIsLogging = true;
                         TextView log_tv = (TextView)findViewById(R.id.log);
                         log_tv.setVisibility(View.VISIBLE);
 
@@ -132,7 +132,7 @@ public class ARMarkerActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("CES_DEMO", "[ARMarkerActivity][BroadcastReceiver]");
+            Log.d("WAITERBOT_ORDER_APP", "[ARMarkerActivity][BroadcastReceiver]");
         }
     }
 }
