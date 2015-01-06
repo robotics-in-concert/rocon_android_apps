@@ -20,5 +20,6 @@ include 'my_android_library_project'
 */
 //include 'motion_retargeting'
 //include 'map_annotation'
-include 'waiterbot_order_app'
+//include 'waiterbot_order_app'
 //include 'concert_teleop'
+include 'beacon_awareness'
