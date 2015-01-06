@@ -17,6 +17,8 @@ import com.github.rosjava.android_remocons.common_tools.master.RoconDescription;
 import com.github.rosjava.android_remocons.common_tools.rocon.AppLauncher;
 import com.github.rosjava.android_remocons.common_tools.rocon.AppsManager;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.ros.address.InetAddressFactory;
 import org.ros.android.NodeMainExecutorService;
 import org.ros.exception.RemoteException;
@@ -52,6 +54,11 @@ public class RoconConnector{
     private int masterPort = 11311;
     private String masterHost = "localhost";
     private String masterUri  = "http://" + masterHost + ":" + masterPort;
+
+    private RoconConnector rocon_connector = this;
+    private JSONObject parameters = null;
+    private JSONObject remappings = null;
+
     private Activity parent;
     private MasterId masterId;
     private NodeMainExecutorService nodeMainExecutorService;
@@ -73,10 +80,25 @@ public class RoconConnector{
     public void registerCallback(ICallback rocon_cb) {
         mCallback = rocon_cb;
     }
-    public void setRoconConfig(Activity parent, String master_uri){
+
+    public void setRoconConfig(Activity parent, String master_uri, String parameters, String remappings){
         this.parent = parent;
-        this.masterUri = master_uri;
+        this.masterUri  = master_uri;
+        try {
+
+            this.parameters = new JSONObject(parameters);
+            this.remappings = new JSONObject(remappings.replace("\\/","\\\\/"));
+
+            Log.i("RoconConnector", "parameters : " + this.parameters.toString());
+            Log.i("RoconConnector", "remappings : " + this.remappings.toString());
+
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
+
     public boolean connectRocon(){
         masterId = new MasterId(masterUri,"", "", "");
         URI concertUri = null;
@@ -198,9 +220,14 @@ public class RoconConnector{
                 am.shutdown();
                 throw new Exception("Cannot get app info for hash " + appHash + ". Aborting app launch");
             }
+
             Yaml param_yaml = new Yaml();
             Map<String, String> params = (Map<String, String>) param_yaml.load(app.getParameters());
             if (params != null && params.size() > 0){
+                //todo
+                // add extra data in param
+                // ex.) location data in order app
+                //      params.put("extra_data",String.valueOf(extraData));
                 Yaml yaml = new Yaml();
                 app.setParameters(yaml.dump(params));
             }
@@ -225,6 +252,7 @@ public class RoconConnector{
         Log.e("RoconConnector", "launchApp end");
 
     }
+
     private boolean waitFor(final int timeout) {
             waiting_flag = true;
             AsyncTask<Void, Void, Boolean> asyncTask = new AsyncTask<Void, Void, Boolean>() {
@@ -278,6 +306,10 @@ public class RoconConnector{
     private class BeaconAwarenessNode implements NodeMain {
         public final java.lang.String NODE_NAME = "beacon_awareness";
         private Publisher<std_msgs.String> pub_beacons;
+        private String pub_beacons_topic_name = "beacons";
+        private String sub_start_app_topic_name = "start_app";
+
+
 
         void publish (String data){
             if(pub_beacons != null){
@@ -293,11 +325,17 @@ public class RoconConnector{
         @Override
         public void onStart(ConnectedNode connectedNode) {
             sendData2UI("onConnect");
-            isConnectRocon = true;
-            pub_beacons = connectedNode.newPublisher("beacons", "std_msgs/String");
+
+            //pub_beacons_topic_name = remappings.optString(pub_beacons_topic_name);
+            //sub_start_app_topic_name = remappings.getString(sub_start_app_topic_name);
+
+            pub_beacons_topic_name = pub_beacons_topic_name;
+            sub_start_app_topic_name = sub_start_app_topic_name;
+
+            pub_beacons = connectedNode.newPublisher(pub_beacons_topic_name , "std_msgs/String");
             pub_beacons.setLatchMode(true);
             Subscriber<std_msgs.String> sub_app_start =
-                    connectedNode.newSubscriber("start_app", std_msgs.String._TYPE);
+                    connectedNode.newSubscriber(sub_start_app_topic_name, std_msgs.String._TYPE);
 
             sub_app_start.addMessageListener(new MessageListener<std_msgs.String>() {
                 @Override
@@ -316,6 +354,8 @@ public class RoconConnector{
                     }
                 }
             });
+
+            isConnectRocon = true;
             waiting_flag = false;
         }
         @Override

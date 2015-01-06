@@ -20,6 +20,15 @@ import android.widget.TextView;
 
 import com.github.rosjava.android_remocons.common_tools.master.RoconDescription;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.yaml.snakeyaml.Yaml;
+
+import java.net.URLEncoder;
+import java.util.Iterator;
+import java.util.Map;
+
 
 public class BeaconAwarenessMainActivity extends Activity implements View.OnClickListener{
 
@@ -171,6 +180,7 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
             Log.i("[BeaconAwareness]", "master uri-"+master_uri);
             Log.i("[BeaconAwareness]", "remappings-"+remappings);
             Log.i("[BeaconAwareness]", "parameters-"+parameters);
+
         }
 
     }
@@ -314,7 +324,7 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
             parameters = edit_text.getText().toString();
             edit_text = (EditText)ba_ex_activity.findViewById(R.id.remapping_txt);
             remappings = edit_text.getText().toString();
-            rocon_connector.setRoconConfig(ba_ex_activity,master_uri);
+            rocon_connector.setRoconConfig(ba_ex_activity,master_uri, parameters, remappings);
             rocon_connector.registerCallback(new RoconConnector.ICallback() {
                 @Override
                 public void sendData(String data) {
