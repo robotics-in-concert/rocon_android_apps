@@ -19,7 +19,7 @@ dependencies {
     compile 'com.github.rosjava.android_remocons:common_tools:[0.1,0.2)'
 }
 
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 15
