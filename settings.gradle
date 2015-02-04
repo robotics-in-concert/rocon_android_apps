@@ -14,12 +14,7 @@
  * the License.
  */
 
-/* Uncomment these and add your own packages to be gradled
-include 'my_android_project'
-include 'my_android_library_project'
-*/
-//include 'motion_retargeting'
-//include 'map_annotation'
-//include 'waiterbot_order_app'
-//include 'concert_teleop'
+include 'motion_retargeting'
+include 'map_annotation'
+include 'waiterbot_order_app'
 include 'beacon_awareness'
