@@ -30,4 +30,3 @@ android {
     }
 
 }
-defaultTasks 'assembleRelease'
