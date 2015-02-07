@@ -1,14 +1,11 @@
 package com.github.robotics_in_concert.rocon_android_apps.beacon_awareness;
+
 import android.app.Activity;
-import android.app.Service;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.github.rosjava.android_remocons.common_tools.master.ConcertChecker;
 import com.github.rosjava.android_remocons.common_tools.master.MasterDescription;
@@ -34,9 +31,7 @@ import org.ros.node.topic.Publisher;
 import org.ros.node.topic.Subscriber;
 import org.yaml.snakeyaml.Yaml;
 
-import java.lang.String;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -44,7 +39,6 @@ import java.util.concurrent.TimeoutException;
 
 import rocon_interaction_msgs.GetInteractionResponse;
 import rocon_interaction_msgs.Interaction;
-import std_msgs.*;
 
 /**
  * Created by dwlee on 14. 12. 2.

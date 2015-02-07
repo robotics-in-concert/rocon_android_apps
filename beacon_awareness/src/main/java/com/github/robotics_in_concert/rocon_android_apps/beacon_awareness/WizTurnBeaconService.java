@@ -1,6 +1,5 @@
 package com.github.robotics_in_concert.rocon_android_apps.beacon_awareness;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;

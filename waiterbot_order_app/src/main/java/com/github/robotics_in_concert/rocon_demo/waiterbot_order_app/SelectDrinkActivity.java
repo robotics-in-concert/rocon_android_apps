@@ -1,41 +1,23 @@
 package com.github.robotics_in_concert.rocon_demo.waiterbot_order_app;
 
-import android.app.*;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
-// Android Log
-import android.util.Log;
-
-
-// RosJava Imports
-import org.ros.message.MessageListener;
 import org.ros.node.ConnectedNode;
-import org.ros.node.NodeListener;
-import org.ros.node.NodeMain;
-import org.ros.node.topic.Publisher;
-import org.ros.node.topic.Subscriber;
-import org.ros.node.NodeMainExecutor;
-import org.ros.node.NodeConfiguration;
-import org.ros.node.AbstractNodeMain;
-import org.ros.namespace.GraphName;
-import org.ros.address.InetAddressFactory;
 
+// Android Log
+// RosJava Imports
 // Android Core Imports
-import org.ros.android.MessageCallable;
-import org.ros.android.view.RosTextView;
-
-import java.lang.String;
-import java.util.Collection;
-import java.util.concurrent.ScheduledExecutorService;
-
-import std_msgs.*;
 
 
 public class SelectDrinkActivity extends Activity
