@@ -1,5 +1,6 @@
 package com.github.robotics_in_concert.rocon_android_apps.beacon_awareness;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -21,6 +22,8 @@ import com.wizturn.sdk.WizTurnProximityState;
 import com.wizturn.sdk.baseclass.IWizTurnController;
 import com.wizturn.sdk.entity.WizTurnBeacons;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -34,7 +37,7 @@ public class WizTurnBeaconService extends Service {
     public WizTurnManager _wizturnMgr;
     private Vibrator _vibrator;
 
-    private double minimum_distance = 1.5;
+    private double minimum_distance = 1.0;
     private String pre_awareness_beacon = "";
     private boolean isbinding = false;
     private int noti_id = 0;
@@ -183,11 +186,27 @@ public class WizTurnBeaconService extends Service {
         }
     }
 
+    private static ArrayList<String> recog_beacons = new ArrayList<String>();
+    private int max_recong_beacons_num = 1;
+
+    private void set_recog_beacon(String beacon_data){
+        if (recog_beacons.size() >= max_recong_beacons_num){
+            recog_beacons.remove(0);
+        }
+        recog_beacons.add(beacon_data);
+    }
+    private String get_recog_beacon(){
+        HashSet hs = new HashSet(recog_beacons);
+        ArrayList<String> return_value = new ArrayList<String>(hs);
+        return return_value.toString();
+    }
+
     private WizTurnDelegate _wtDelegate = new WizTurnDelegate() {
         //GetRssi Event
         @Override
         public void onGetRSSI(IWizTurnController iWizTurnController, List<String> Data, List<Integer> RSSI) {
         }
+
         @Override
         public void onGetDeviceList(IWizTurnController iWizTurnController, final List<WizTurnBeacons> device) {
             String strMac = "";
@@ -220,7 +239,6 @@ public class WizTurnBeaconService extends Service {
         //Proximity Event
         @Override
         public void onGetProximity(IWizTurnController iWizTurnController, WizTurnProximityState proximity) {
-
         }
     };
 

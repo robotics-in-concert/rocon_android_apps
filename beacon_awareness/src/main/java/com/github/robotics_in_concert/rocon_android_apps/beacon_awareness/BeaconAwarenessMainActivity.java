@@ -3,14 +3,19 @@ package com.github.robotics_in_concert.rocon_android_apps.beacon_awareness;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +24,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.rosjava.android_remocons.common_tools.master.RoconDescription;
+
+import java.util.ArrayList;
 
 
 public class BeaconAwarenessMainActivity extends Activity implements View.OnClickListener{
@@ -35,8 +42,9 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
     private RoconDescription rocon_desc = null;
     private Activity ba_ex_activity= this;
     private String last_detected_beacon = "";
-    final RoconConnector rocon_connector = new RoconConnector();
-    DialogInterface ConnectConfirmDlg = null;
+    private CharSequence[] launchable_app_list = null;
+    final BeaconAwarenessRoconConnector rocon_connector = new BeaconAwarenessRoconConnector();
+    private AlertDialog ConnectConfirmDlg = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +56,25 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
         findViewById(R.id.srv_stop).setOnClickListener(this);
         findViewById(R.id.rocon_srv_start).setOnClickListener(this);
         findViewById(R.id.logo_show).setOnClickListener(this);
-
         initUI();
         initRoconConfig(false);
+        connectRocon();
+
         if (isWizturnServiceRunning()){
-            Log.i("[BeaconAwareness]", "On Create BeaconAwareness services running?-true");
+            Log.i("[BeaconAwareness]", "BeaconAwareness services running?-true");
             startWizturnService(true);
         }
         else{
-            Log.i("[BeaconAwareness]", "On Create BeaconAwareness services running?-false");
+            Log.i("[BeaconAwareness]", "BeaconAwareness services running?-false");
+        }
+
+        String version;
+        try {
+            PackageInfo i = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
+            Log.i("[BeaconAwareness]", "versionName: " + i.versionName);
+            Log.i("[BeaconAwareness]", "versionCode: " + i.versionCode);
+
+        } catch(PackageManager.NameNotFoundException e) {
         }
     }
 
@@ -69,9 +87,7 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
             unbindService(mConnection);
             is_bound= false;
         }
-        if(rocon_connector.isConnectRocon) {
-            rocon_connector.disConnectRocon();
-        }
+        disconnectRocon();
     }
 
     @Override
@@ -97,6 +113,7 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
     }
 
     private void initUI(){
+        last_detected_beacon = "";
         LinearLayout linear_layout = (LinearLayout)BeaconAwarenessMainActivity.this.findViewById(R.id.linearLayout);
         linear_layout.setVisibility(View.INVISIBLE);
     }
@@ -123,7 +140,7 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
     private void initRoconConfig(boolean isRestart){
         TextView text_view;
         text_view = (TextView) com.github.robotics_in_concert.rocon_android_apps.beacon_awareness.BeaconAwarenessMainActivity.this.findViewById(R.id.rocon_status_txt);
-        if (rocon_connector.isConnectRocon == true){
+        if (rocon_connector.isConnectRocon){
             text_view.setText("Connected");
         }
         else{
@@ -171,7 +188,6 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
             Log.i("[BeaconAwareness]", "master uri-"+master_uri);
             Log.i("[BeaconAwareness]", "remappings-"+remappings);
             Log.i("[BeaconAwareness]", "parameters-"+parameters);
-
         }
 
     }
@@ -208,7 +224,7 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
             text_view.setText("Scan Stop");
         }
         if(rocon_connector.isConnectRocon) {
-            rocon_connector.disConnectRocon();
+            disconnectRocon();
         }
     }
 
@@ -217,15 +233,17 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
         switch(v.getId()){
             case R.id.srv_start:
                 Log.i("[BeaconAwareness]", "push srv_start-"+is_bound);
+                connectRocon();
                 startWizturnService(false);
                 break;
             case R.id.srv_stop:
                 Log.i("[BeaconAwareness]", "push srv_stop-"+is_bound);
                 stopWizturnService();
+                disconnectRocon();
                 break;
             case R.id.rocon_srv_start:
                 Log.i("[BeaconAwareness]", "push rocon_srv_start");
-                connectRocon(last_detected_beacon);
+                startAppLaunchService();
                 break;
             case R.id.logo_show:
                 LinearLayout linear_layout = (LinearLayout)BeaconAwarenessMainActivity.this.findViewById(R.id.linearLayout);
@@ -238,6 +256,89 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
                 break;
             default:
                 break;
+        }
+    }
+
+    private AlertDialog.Builder dialogConnectConfirm = null;
+    private void destroyLaunchableAppSelectorDialog(){
+        Log.i("[BeaconAwareness]", "ConnectConfirmDlg dismiss: beacon info is null");
+        if (ConnectConfirmDlg != null ){
+            Log.i("[BeaconAwareness]", "ConnectConfirmDlg dismiss: beacon info is null");
+            ConnectConfirmDlg.dismiss();
+        }
+        else{
+            Log.i("[BeaconAwareness]", "ConnectConfirmDlg dismiss: beacon info is already null");
+        }
+    }
+
+    private void createLaunchableAppSelectorDialog(){
+        //creatSelection Popup
+        if(ConnectConfirmDlg != null){
+            Log.i("[BeaconAwareness]", "ConnectConfirmDlg dismiss: already pupop");
+            ConnectConfirmDlg.dismiss();
+        }
+        dialogConnectConfirm = new AlertDialog.Builder(com.github.robotics_in_concert.rocon_android_apps.beacon_awareness.BeaconAwarenessMainActivity.this);
+        dialogConnectConfirm.setTitle("You can start rocon service. Please choose!");
+        dialogConnectConfirm.setSingleChoiceItems(launchable_app_list, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String user_friendly_name = (String) launchable_app_list[which];
+                Log.i("[BeaconAwareness]", "Selected service: " + user_friendly_name);
+                int app_hash = Integer.parseInt(user_friendly_name.split("\\/")[1]);
+                appLauncher(app_hash);
+            }
+        });
+        dialogConnectConfirm.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dlog, int i) {
+                dlog.dismiss();
+                dialogConnectConfirm = null;
+            }
+        });
+        ConnectConfirmDlg = dialogConnectConfirm.create();
+        ConnectConfirmDlg.show();
+    }
+
+    private ProgressDialog progressDialog = null;
+    private void createProgressDialog(){
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+        progressDialog = ProgressDialog.show(this,"", "Waiting Rocon...", true, true);
+        progressDialog.setCancelable(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+    }
+    private void destroyProgressDialog(){
+        if (progressDialog != null){
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }
+
+    private void startAppLaunchService(){
+        if (last_detected_beacon.length() != 0 ){
+            updateLaunchableAppList(last_detected_beacon);
+            Button btn = (Button)ba_ex_activity.findViewById(R.id.rocon_srv_start);
+            Log.i("[BeaconAwareness]", "launchable_app_list: "+ launchable_app_list);
+            Log.i("[BeaconAwareness]", "rocon_connector.isConnectRocon: "+ rocon_connector.isConnectRocon);
+            if (launchable_app_list != null && launchable_app_list.length != 0 ){
+                createLaunchableAppSelectorDialog();
+            }
+
+            if (rocon_connector.isConnectRocon){
+                btn.setVisibility(Button.VISIBLE);
+            }
+            else{
+                btn.setVisibility(Button.INVISIBLE);
+            }
+
+            publishData2Rocon(last_detected_beacon);
+        }
+        else{
+            destroyLaunchableAppSelectorDialog();
+            last_detected_beacon = "";
+            Button btn = (Button)ba_ex_activity.findViewById(R.id.rocon_srv_start);
+            btn.setVisibility(Button.INVISIBLE);
         }
     }
 
@@ -257,43 +358,11 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
             is_bound = false;
         }
 
-        AlertDialog.Builder dialogConnectConfirm = null;
         private WizTurnBeaconService.ICallback mRoconCallback = new WizTurnBeaconService.ICallback() {
             @Override
             public void sendData(String data) {
                 last_detected_beacon = data;
-                if (last_detected_beacon.length() != 0 ){
-                    if(ConnectConfirmDlg != null){
-                        ConnectConfirmDlg.dismiss();
-                    }
-                        //dialog.setIcon(R.drawable.playstore_icon_small);
-                    dialogConnectConfirm = new AlertDialog.Builder(com.github.robotics_in_concert.rocon_android_apps.beacon_awareness.BeaconAwarenessMainActivity.this);
-                    dialogConnectConfirm.setMessage("Do you want to launch new rocon service?");
-                    dialogConnectConfirm.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dlog, int i) {
-                            connectRocon(last_detected_beacon);
-                            dlog.dismiss();
-                        }
-                    });
-                    dialogConnectConfirm.setNegativeButton("No", new DialogInterface.OnClickListener(){
-                        @Override
-                        public void onClick(DialogInterface dlog, int i) {
-                            dlog.dismiss();
-                            dialogConnectConfirm = null;
-                        }
-                    });
-                    ConnectConfirmDlg = dialogConnectConfirm.show();
-
-                    Button btn = (Button)ba_ex_activity.findViewById(R.id.rocon_srv_start);
-                    btn.setVisibility(Button.VISIBLE);
-                }
-                else{
-                    last_detected_beacon = "";
-                    Button btn = (Button)ba_ex_activity.findViewById(R.id.rocon_srv_start);
-                    btn.setVisibility(Button.INVISIBLE);
-                    ConnectConfirmDlg.dismiss();
-                }
+                startAppLaunchService();
             }
         };
 
@@ -305,29 +374,118 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
             }
         };
     };
-
-    private void connectRocon(String macAdrr){
-        if (rocon_connector.isConnectRocon == false){
-            EditText edit_text;
-            edit_text = (EditText)ba_ex_activity.findViewById(R.id.master_uri_txt);
-            master_uri = edit_text.getText().toString();
-            edit_text = (EditText)ba_ex_activity.findViewById(R.id.parameters_txt);
-            parameters = edit_text.getText().toString();
-            edit_text = (EditText)ba_ex_activity.findViewById(R.id.remapping_txt);
-            remappings = edit_text.getText().toString();
-            rocon_connector.setRoconConfig(ba_ex_activity,master_uri, parameters, remappings);
-            rocon_connector.registerCallback(new RoconConnector.ICallback() {
-                @Override
-                public void sendData(String data) {
-                    TextView text_view;
-                    text_view = (TextView)ba_ex_activity.findViewById(R.id.rocon_status_txt);
-                    text_view.setText(data);
-                }
-            });
-            rocon_connector.connectRocon();
+    private void publishData2Rocon(String data){
+        if (rocon_connector.isConnectRocon){
+            rocon_connector.publish_beacons_topic(data);
         }
-        rocon_connector.publish(macAdrr);
     }
+    private boolean isCheckingRocon = false;
+
+    private void connectRocon(){
+        if (isCheckingRocon == true){
+            Log.i("[BeaconAwareness]", "Now Checking rocon.......... wait");
+            return;
+        }
+        createProgressDialog();
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i("[BeaconAwareness]", "Connect rocon");
+                if (rocon_connector.isConnectRocon == false){
+                    isCheckingRocon = true;
+                    EditText edit_text;
+                    edit_text = (EditText)ba_ex_activity.findViewById(R.id.master_uri_txt);
+                    master_uri = edit_text.getText().toString();
+                    edit_text = (EditText)ba_ex_activity.findViewById(R.id.parameters_txt);
+                    parameters = edit_text.getText().toString();
+                    edit_text = (EditText)ba_ex_activity.findViewById(R.id.remapping_txt);
+                    remappings = edit_text.getText().toString();
+                    rocon_connector.setRoconConfig(ba_ex_activity,master_uri, parameters, remappings);
+                    rocon_connector.registerCallback(new BeaconAwarenessRoconConnector.ICallback() {
+                        @Override
+                        public void sendUIData(String data) {
+                            TextView text_view;
+                            text_view = (TextView)ba_ex_activity.findViewById(R.id.rocon_status_txt);
+                            text_view.setText(data);
+                        }
+                    });
+                    rocon_connector.connectRocon();
+                }
+                destroyProgressDialog();
+                isCheckingRocon = false;
+                if(rocon_connector.isConnectRocon){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            startAppLaunchService();
+                        }
+                    });
+                    Log.i("[BeaconAwareness]", "Connected rocon");
+                }
+                else{
+                    Log.i("[BeaconAwareness]", "Not connected rocon");
+                }
+            }
+        });
+        t.start();
+    }
+
+    private void disconnectRocon(){
+        if(rocon_connector.isConnectRocon) {
+            rocon_connector.disConnectRocon();
+        }
+    }
+
+    private void updateLaunchableAppList(String detected_beacon){
+        if(rocon_connector.isConnectRocon) {
+            ArrayList<String> launchableApps = rocon_connector.getLaunchableApps(detected_beacon);
+            launchable_app_list = launchableApps.toArray(new CharSequence[launchableApps.size()]);
+        }
+    }
+
+    private void appLauncher(int app_hash){
+        rocon_connector.appLauncher(app_hash);
+    }
+
+//    public class ProgressDialogWrapper {
+//        private ProgressDialog progressDialog;
+//        private Activity activity;
+//
+//        public ProgressDialogWrapper(Activity activity) {
+//            this.activity = activity;
+//            progressDialog = null;
+//        }
+//
+//        public void dismiss() {
+//            Log.d("[ProgressDialogWrapper]", "dismiss progress dialog");
+//            activity.runOnUiThread(new Runnable() {
+//                public void run() {
+//                    if (progressDialog != null) {
+//                        progressDialog.dismiss();
+//                        progressDialog = null;
+//                    }
+//                }
+//            });
+//        }
+//
+//        public void show(final String title, final String text) {
+//            Log.d("[ProgressDialogWrapper]", "run on ui thread");
+//            activity.runOnUiThread(new Runnable() {
+//                public void run() {
+//                    if (progressDialog != null) {
+//                        Log.d("[ProgressDialogWrapper]", "Restarting the spinner with a new message");
+//                        progressDialog.dismiss();
+//                    }
+//                    Log.d("[ProgressDialogWrapper]", "start progress dialog");
+//                    progressDialog = ProgressDialog.show(activity, title, text, true, true);
+//                    progressDialog.setCancelable(false);
+//                    progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//                    Log.d("[ProgressDialogWrapper]", "showing progress dialog");
+//                }
+//            });
+//        }
+//    }
+
 
     /*
     @Override
