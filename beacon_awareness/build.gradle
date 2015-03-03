@@ -1,7 +1,7 @@
 
 dependencies {
-    compile 'org.ros.rosjava_core:rosjava:[0.1,0.2)'
-    compile 'com.github.rosjava.android_remocons:common_tools:[0.1,0.2)'
+    compile 'org.ros.rosjava_core:rosjava:[0.2,0.3)'
+    compile 'com.github.rosjava.android_remocons:common_tools:[0.2,0.3)'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
 }
