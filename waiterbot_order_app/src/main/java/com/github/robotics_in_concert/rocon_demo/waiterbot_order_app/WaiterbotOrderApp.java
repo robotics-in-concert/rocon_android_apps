@@ -1,45 +1,37 @@
 package com.github.robotics_in_concert.rocon_demo.waiterbot_order_app;
 
-import android.app.*;
 import android.content.Intent;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
-
-// Android Log
+import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
-
-// RosJava Imports
-import org.ros.internal.message.RawMessage;
-import org.ros.message.MessageListener;
-import org.ros.node.ConnectedNode;
-import org.ros.node.NodeListener;
-import org.ros.node.NodeMain;
-import org.ros.node.topic.Publisher;
-import org.ros.node.topic.Subscriber;
-import org.ros.node.NodeMainExecutor;
-import org.ros.node.NodeConfiguration;
-import org.ros.node.AbstractNodeMain;
-import org.ros.namespace.GraphName;
-import org.ros.address.InetAddressFactory;
-
-// Android Core Imports
-import org.ros.android.MessageCallable;
-import org.ros.android.view.RosTextView;
-
-// Android App Imports
 import com.github.rosjava.android_remocons.common_tools.apps.RosAppActivity;
 
-import java.lang.String;
+import org.ros.address.InetAddressFactory;
+import org.ros.android.view.RosTextView;
+import org.ros.message.MessageListener;
+import org.ros.namespace.GraphName;
+import org.ros.node.AbstractNodeMain;
+import org.ros.node.ConnectedNode;
+import org.ros.node.NodeConfiguration;
+import org.ros.node.NodeMainExecutor;
+import org.ros.node.topic.Publisher;
+import org.ros.node.topic.Subscriber;
+
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 
-import std_msgs.*;
-import diagnostic_msgs.*;
+import diagnostic_msgs.DiagnosticArray;
+import diagnostic_msgs.DiagnosticStatus;
+import diagnostic_msgs.KeyValue;
+
+// Android Log
+// RosJava Imports
+// Android Core Imports
+// Android App Imports
 
 public class WaiterbotOrderApp extends RosAppActivity
 {

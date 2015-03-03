@@ -1,8 +1,6 @@
 package com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations;
 
 import org.ros.android.view.visualization.Color;
-import org.ros.rosjava_geometry.Transform;
-import org.ros.rosjava_geometry.Vector3;
 
 public class Location extends Annotation {
     public static final String GROUP_NAME = "Location Points";

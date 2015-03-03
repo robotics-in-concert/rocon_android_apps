@@ -15,12 +15,12 @@
  */
 
 dependencies {
-  compile 'com.github.rosjava.android_apps:application_management:0.1.+'
-  compile 'org.ros.android_core:android_gingerbread_mr1:0.1.+'
-  compile 'org.ros.rosjava_core:rosjava:0.1.+'
+    compile 'com.github.rosjava.android_apps:application_management:0.1.4'
+    compile 'org.ros.android_core:android_gingerbread_mr1:0.1.2'
+    compile 'org.ros.rosjava_core:rosjava:0.1.6'
 }
 
-apply plugin: 'android'
+apply plugin: 'com.android.application'
   
 android {
     compileSdkVersion 10

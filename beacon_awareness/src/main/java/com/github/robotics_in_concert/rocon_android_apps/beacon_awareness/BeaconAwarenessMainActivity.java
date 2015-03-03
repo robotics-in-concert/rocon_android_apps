@@ -20,15 +20,6 @@ import android.widget.TextView;
 
 import com.github.rosjava.android_remocons.common_tools.master.RoconDescription;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.yaml.snakeyaml.Yaml;
-
-import java.net.URLEncoder;
-import java.util.Iterator;
-import java.util.Map;
-
 
 public class BeaconAwarenessMainActivity extends Activity implements View.OnClickListener{
 

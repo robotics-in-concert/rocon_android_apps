@@ -1,9 +1,14 @@
 
 package com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list;
 
-import java.util.Random;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Annotation;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Column;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Location;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Marker;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Table;
+import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.Wall;
 
-import com.github.robotics_in_concert.rocon_android_apps.map_annotation.annotations_list.annotations.*;
+import java.util.Random;
 
 public class MockDataProvider {
     // A utility method that generates random annotations

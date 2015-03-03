@@ -1,6 +1,6 @@
 package com.github.robotics_in_concert.rocon_demo.waiterbot_order_app;
 
-import android.app.*;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,10 +8,12 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.*;
+import android.os.Bundle;
 import android.util.Log;
-import android.view.*;
-import android.widget.*;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 public class ARMarkerActivity extends Activity {
     private String m_drink_type = "";
