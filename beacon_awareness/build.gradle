@@ -1,10 +1,9 @@
 
 dependencies {
-    compile 'org.ros.rosjava_core:rosjava:[0.1,0.2)'
-    compile 'org.ros.android_core:android_honeycomb_mr2:[0.1,0.2)'
-    compile 'com.github.rosjava.android_remocons:common_tools:[0.1,0.2)'
-    compile files('libs/wizturnbeaconsdk.jar')
+    compile 'org.ros.rosjava_core:rosjava:[0.2,0.3)'
+    compile 'com.github.rosjava.android_remocons:common_tools:[0.2,0.3)'
     compile fileTree(dir: 'libs', include: ['*.jar'])
+
 }
 
 apply plugin: 'com.android.application'
@@ -17,8 +16,8 @@ android {
         applicationId "com.github.robotics_in_concert.rocon_android_apps.beacon_awareness"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.1.1"
     }
 }
 
