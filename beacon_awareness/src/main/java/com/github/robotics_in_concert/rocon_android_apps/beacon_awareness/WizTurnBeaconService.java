@@ -23,6 +23,7 @@ import com.wizturn.sdk.baseclass.IWizTurnController;
 import com.wizturn.sdk.entity.WizTurnBeacons;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Timer;
@@ -47,6 +48,9 @@ public class WizTurnBeaconService extends Service {
     NotificationManager notification_mgr = null;
     Notification noti = null;
     private SendMassgeHandler mMainHandler = new SendMassgeHandler();
+
+    private static ArrayList<String> recog_beacons = new ArrayList<String>();
+    private int max_recong_beacons_num = 3;
 
     private TimerTask mTask;
     private Timer mTimer;
@@ -186,19 +190,41 @@ public class WizTurnBeaconService extends Service {
         }
     }
 
-    private static ArrayList<String> recog_beacons = new ArrayList<String>();
-    private int max_recong_beacons_num = 1;
-
     private void set_recog_beacon(String beacon_data){
         if (recog_beacons.size() >= max_recong_beacons_num){
             recog_beacons.remove(0);
         }
         recog_beacons.add(beacon_data);
+        Log.i("[WTSrv]", "set_recog_beacon: " + recog_beacons.toString());
     }
     private String get_recog_beacon(){
+        HashMap<String, Integer> recog_beacon_map = new HashMap<String, Integer>();
+        for(int i = 0 ; i < recog_beacons.size() ; i ++ ){
+            if (recog_beacon_map.containsKey(recog_beacons.get(i)) == false){
+                recog_beacon_map.put(recog_beacons.get(i),1);
+            }else{
+                int count = recog_beacon_map.get(recog_beacons.get(i));
+                recog_beacon_map.put(recog_beacons.get(i),count+1);
+            }
+        }
+
         HashSet hs = new HashSet(recog_beacons);
-        ArrayList<String> return_value = new ArrayList<String>(hs);
-        return return_value.toString();
+        ArrayList<String> recog_beacons_key = new ArrayList<String>(hs);
+
+        int max_count = -1;
+        String return_beacon = "";
+        for(int i = 0 ; i< recog_beacons_key.size(); i ++){
+            int count = recog_beacon_map.get(recog_beacons_key.get(i));
+            if (count > max_count){
+                return_beacon = recog_beacons_key.get(i);
+                max_count = count;
+            }
+        }
+        if (max_count < (int)((float)max_recong_beacons_num/2+0.5)){
+            return_beacon = "";
+        }
+        Log.i("[WTSrv]", "get_recog_beacon: " + max_count + " / " + return_beacon);
+        return return_beacon;
     }
 
     private WizTurnDelegate _wtDelegate = new WizTurnDelegate() {
@@ -214,10 +240,15 @@ public class WizTurnBeaconService extends Service {
             for (int i = 0; i < device.size(); i++) {
                 if (minimum_distance < device.get(i).getDistance()) {
                     continue;
+                }else{
+                    set_recog_beacon(device.get(i).getMacAddress());
                 }
-                strMac = device.get(i).getMacAddress();
-                strScanResult = "discoveried device: ["+strMac+"] ["+device.get(i).getDistance() +" m]";
+                strMac = get_recog_beacon();
+                if(strMac.length() == 0){
+                    continue;
+                }
 
+                strScanResult = "discoveried device: ["+strMac+"] ["+device.get(i).getDistance() +" m]";
                 if (mTimer != null){
                     mTimer.cancel();
                     mTimer.purge();
@@ -246,6 +277,7 @@ public class WizTurnBeaconService extends Service {
         public void run() {
             Log.i("[WTSrv]" ,"Alram Timer!!!!");
             pre_awareness_beacon = "";
+            recog_beacons.clear();
             deleteNoit();
             sendData2Rocon("");
             sendData2UI("Scanning...");
