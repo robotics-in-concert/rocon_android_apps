@@ -48,7 +48,7 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i("[BeaconAwareness]", "onCreate");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_beacon_awareness_main);
 
@@ -88,6 +88,8 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
             is_bound= false;
         }
         disconnectRocon();
+        destroyProgressDialog();
+        destroyLaunchableAppSelectorDialog();
     }
 
     @Override
@@ -261,10 +263,10 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
 
     private AlertDialog.Builder dialogConnectConfirm = null;
     private void destroyLaunchableAppSelectorDialog(){
-        Log.i("[BeaconAwareness]", "ConnectConfirmDlg dismiss: beacon info is null");
         if (ConnectConfirmDlg != null ){
             Log.i("[BeaconAwareness]", "ConnectConfirmDlg dismiss: beacon info is null");
             ConnectConfirmDlg.dismiss();
+            ConnectConfirmDlg = null;
         }
         else{
             Log.i("[BeaconAwareness]", "ConnectConfirmDlg dismiss: beacon info is already null");
@@ -273,30 +275,36 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
 
     private void createLaunchableAppSelectorDialog(){
         //creatSelection Popup
-        if(ConnectConfirmDlg != null){
-            Log.i("[BeaconAwareness]", "ConnectConfirmDlg dismiss: already pupop");
-            ConnectConfirmDlg.dismiss();
+        if(!((Activity)BeaconAwarenessMainActivity.this).isFinishing()){
+            if(ConnectConfirmDlg != null){
+                Log.i("[BeaconAwareness]", "ConnectConfirmDlg dismiss: already pupop");
+                ConnectConfirmDlg.dismiss();
+            }
+            dialogConnectConfirm = new AlertDialog.Builder(BeaconAwarenessMainActivity.this);
+            dialogConnectConfirm.setTitle("You can start rocon service. Please choose!");
+            dialogConnectConfirm.setSingleChoiceItems(launchable_app_list, -1, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String user_friendly_name = (String) launchable_app_list[which];
+                    Log.i("[BeaconAwareness]", "Selected service: " + user_friendly_name);
+                    int app_hash = Integer.parseInt(user_friendly_name.split("\\/")[1]);
+                    appLauncher(app_hash);
+                }
+            });
+            dialogConnectConfirm.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dlog, int i) {
+                    dlog.dismiss();
+                    dialogConnectConfirm = null;
+                }
+            });
+            ConnectConfirmDlg = dialogConnectConfirm.create();
+            ConnectConfirmDlg.show();
         }
-        dialogConnectConfirm = new AlertDialog.Builder(com.github.robotics_in_concert.rocon_android_apps.beacon_awareness.BeaconAwarenessMainActivity.this);
-        dialogConnectConfirm.setTitle("You can start rocon service. Please choose!");
-        dialogConnectConfirm.setSingleChoiceItems(launchable_app_list, -1, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String user_friendly_name = (String) launchable_app_list[which];
-                Log.i("[BeaconAwareness]", "Selected service: " + user_friendly_name);
-                int app_hash = Integer.parseInt(user_friendly_name.split("\\/")[1]);
-                appLauncher(app_hash);
-            }
-        });
-        dialogConnectConfirm.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dlog, int i) {
-                dlog.dismiss();
-                dialogConnectConfirm = null;
-            }
-        });
-        ConnectConfirmDlg = dialogConnectConfirm.create();
-        ConnectConfirmDlg.show();
+        else{
+            Log.i("[BeaconAwareness]", "Activity is not running!!");
+        }
+
     }
 
     private ProgressDialog progressDialog = null;
@@ -447,65 +455,6 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
         rocon_connector.appLauncher(app_hash);
     }
 
-//    public class ProgressDialogWrapper {
-//        private ProgressDialog progressDialog;
-//        private Activity activity;
-//
-//        public ProgressDialogWrapper(Activity activity) {
-//            this.activity = activity;
-//            progressDialog = null;
-//        }
-//
-//        public void dismiss() {
-//            Log.d("[ProgressDialogWrapper]", "dismiss progress dialog");
-//            activity.runOnUiThread(new Runnable() {
-//                public void run() {
-//                    if (progressDialog != null) {
-//                        progressDialog.dismiss();
-//                        progressDialog = null;
-//                    }
-//                }
-//            });
-//        }
-//
-//        public void show(final String title, final String text) {
-//            Log.d("[ProgressDialogWrapper]", "run on ui thread");
-//            activity.runOnUiThread(new Runnable() {
-//                public void run() {
-//                    if (progressDialog != null) {
-//                        Log.d("[ProgressDialogWrapper]", "Restarting the spinner with a new message");
-//                        progressDialog.dismiss();
-//                    }
-//                    Log.d("[ProgressDialogWrapper]", "start progress dialog");
-//                    progressDialog = ProgressDialog.show(activity, title, text, true, true);
-//                    progressDialog.setCancelable(false);
-//                    progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//                    Log.d("[ProgressDialogWrapper]", "showing progress dialog");
-//                }
-//            });
-//        }
-//    }
 
 
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_beacon_awareness_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    */
 }
