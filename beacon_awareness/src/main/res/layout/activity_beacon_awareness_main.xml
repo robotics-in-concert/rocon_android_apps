@@ -27,7 +27,9 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:visibility="visible">
+        android:visibility="visible"
+        android:layout_above="@+id/bt_status"
+        android:weightSum="1">
 
         <TextView android:text="Master URI" android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,48 +56,25 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Parameters"
-            android:id="@+id/parameters"
+            android:text="DBG LOG"
+            android:id="@+id/dbg_log"
             android:layout_below="@+id/master_uri_txt"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/parameters_txt"
-            android:layout_below="@+id/parameters"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:text="{}"
-            android:textSize="25dp" />
-
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Remapping"
-            android:id="@+id/remapping"
-            android:layout_below="@+id/parameters_txt"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/remapping_txt"
-            android:layout_below="@+id/remapping"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/dbg_log_txt"
+            android:layout_below="@+id/linearLayout"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:text="{}"
-            android:textSize="25dp" />
+            android:textSize="20dp" />
 
     </LinearLayout>
 

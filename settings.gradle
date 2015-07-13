@@ -14,7 +14,7 @@
  * the License.
  */
 
-include 'motion_retargeting'
-include 'map_annotation'
-include 'waiterbot_order_app'
+//include 'motion_retargeting'
+//include 'map_annotation'
+//include 'waiterbot_order_app'
 include 'beacon_awareness'

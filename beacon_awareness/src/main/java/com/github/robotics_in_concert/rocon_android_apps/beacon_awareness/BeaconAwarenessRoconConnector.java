@@ -146,6 +146,7 @@ public class BeaconAwarenessRoconConnector {
         if(isConnectRocon){
             nodeMainExecutorService.shutdownNodeMain(ba_bridge);
         }
+        isConnectRocon = false;
     }
     public void publish_beacons_topic(String data){
         ba_bridge.publish_beacons_topic(data);
@@ -322,7 +323,7 @@ public class BeaconAwarenessRoconConnector {
             interactionsManager.init(rocon_description.getInteractionsNamespace());
             interactionsManager.getAppsForRole(rocon_description.getMasterId(), rocon_description.getCurrentRole());
 
-            if(waitFor(10) == false || this.availableAppsCache == null) {
+            if(waitFor(30) == false || this.availableAppsCache == null) {
 
                 throw new Exception("Cannot get interactions: [name space: " + rocon_description.getInteractionsNamespace() +
                         "][master uri: " + rocon_description.getMasterId() +
@@ -368,7 +369,7 @@ public class BeaconAwarenessRoconConnector {
             am.init(rocon_description.getInteractionsNamespace());
             am.getAppInfo(masterId, app_hash);
             sendData2UI(" Waiting 10s for getAppConfig result, ");
-            if (waitFor(10) == false) {
+            if (waitFor(30) == false) {
                 am.shutdown();
                 throw new Exception("Cannot get app info for hash " + app_hash + ". Aborting app launch");
             }

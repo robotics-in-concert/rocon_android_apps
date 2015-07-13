@@ -126,12 +126,6 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
         edit_text = (EditText)this.findViewById(R.id.master_uri_txt);
         master_uri = edit_text.getText().toString();
 
-        edit_text = (EditText)this.findViewById(R.id.parameters_txt);
-        parameters = edit_text.getText().toString();
-
-        edit_text = (EditText)this.findViewById(R.id.remapping_txt);
-        remappings = edit_text.getText().toString();
-
         SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
         editor.putString(PREFS_KEY_REMAPPINGS, remappings);
         editor.putString(PREFS_KEY_PARAMETERS, parameters);
@@ -152,15 +146,6 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
         if(isRestart == false){
             Bundle intent_data = getIntent().getExtras();
             if (intent_data != null){
-                parameters = intent_data.getString("Parameters");
-                if(parameters == null){
-                    parameters = getPreferences(MODE_PRIVATE).getString(PREFS_KEY_PARAMETERS,"{}");
-                }
-
-                remappings = intent_data.getString("Remappings");
-                if(remappings == null){
-                    remappings = getPreferences(MODE_PRIVATE).getString(PREFS_KEY_REMAPPINGS,"{}");
-                }
 
                 rocon_desc = (RoconDescription) intent_data.get(RoconDescription.UNIQUE_KEY);
                 if(rocon_desc == null){
@@ -172,8 +157,6 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
             }
             else{
                 Log.i("[BeaconAwareness]", "getPreferences");
-                parameters = getPreferences(MODE_PRIVATE).getString(PREFS_KEY_PARAMETERS,"{}");
-                remappings = getPreferences(MODE_PRIVATE).getString(PREFS_KEY_REMAPPINGS,"{}");
                 master_uri = getPreferences(MODE_PRIVATE).getString(PREFS_KEY_MASTER_URI,"http://localhost:11311");
             }
 
@@ -181,15 +164,8 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
             edit_text = (EditText)this.findViewById(R.id.master_uri_txt);
             edit_text.setText(master_uri);
 
-            edit_text = (EditText)this.findViewById(R.id.parameters_txt);
-            edit_text.setText(parameters);
-
-            edit_text = (EditText)this.findViewById(R.id.remapping_txt);
-            edit_text.setText(remappings);
-
             Log.i("[BeaconAwareness]", "master uri-"+master_uri);
-            Log.i("[BeaconAwareness]", "remappings-"+remappings);
-            Log.i("[BeaconAwareness]", "parameters-"+parameters);
+
         }
 
     }
@@ -312,7 +288,7 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
-        progressDialog = ProgressDialog.show(this,"", "Waiting Rocon...", true, true);
+        progressDialog = ProgressDialog.show(this,"", "Waiting Connect Rocon...", true, true);
         progressDialog.setCancelable(false);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
     }
@@ -325,21 +301,20 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
 
     private void startAppLaunchService(){
         if (last_detected_beacon.length() != 0 ){
-            updateLaunchableAppList(last_detected_beacon);
-            Button btn = (Button)ba_ex_activity.findViewById(R.id.rocon_srv_start);
-            Log.i("[BeaconAwareness]", "launchable_app_list: "+ launchable_app_list);
-            Log.i("[BeaconAwareness]", "rocon_connector.isConnectRocon: "+ rocon_connector.isConnectRocon);
-            if (launchable_app_list != null && launchable_app_list.length != 0 ){
-                createLaunchableAppSelectorDialog();
-            }
 
+            Button btn = (Button)ba_ex_activity.findViewById(R.id.rocon_srv_start);
             if (rocon_connector.isConnectRocon){
                 btn.setVisibility(Button.VISIBLE);
+                updateLaunchableAppList(last_detected_beacon);
+                Log.i("[BeaconAwareness]", "launchable_app_list: "+ launchable_app_list);
+                Log.i("[BeaconAwareness]", "rocon_connector.isConnectRocon: " + rocon_connector.isConnectRocon);
+                if (launchable_app_list != null && launchable_app_list.length != 0 ){
+                    createLaunchableAppSelectorDialog();
+                }
             }
             else{
                 btn.setVisibility(Button.INVISIBLE);
             }
-
             publishData2Rocon(last_detected_beacon);
         }
         else{
@@ -372,12 +347,24 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
                 last_detected_beacon = data;
                 startAppLaunchService();
             }
+
+            @Override
+            public void sendDbgData(String data) {
+
+            }
         };
 
         private WizTurnBeaconService.ICallback mWizTurnCallback = new WizTurnBeaconService.ICallback() {
             public void sendData(String data) {
                 TextView text_view;
                 text_view = (TextView)ba_ex_activity.findViewById(R.id.bt_status_txt);
+                text_view.setText(data);
+            }
+
+            @Override
+            public void sendDbgData(String data) {
+                TextView text_view;
+                text_view = (TextView)ba_ex_activity.findViewById(R.id.dbg_log_txt);
                 text_view.setText(data);
             }
         };
@@ -404,10 +391,7 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
                     EditText edit_text;
                     edit_text = (EditText)ba_ex_activity.findViewById(R.id.master_uri_txt);
                     master_uri = edit_text.getText().toString();
-                    edit_text = (EditText)ba_ex_activity.findViewById(R.id.parameters_txt);
-                    parameters = edit_text.getText().toString();
-                    edit_text = (EditText)ba_ex_activity.findViewById(R.id.remapping_txt);
-                    remappings = edit_text.getText().toString();
+
                     rocon_connector.setRoconConfig(ba_ex_activity,master_uri, parameters, remappings);
                     rocon_connector.registerCallback(new BeaconAwarenessRoconConnector.ICallback() {
                         @Override

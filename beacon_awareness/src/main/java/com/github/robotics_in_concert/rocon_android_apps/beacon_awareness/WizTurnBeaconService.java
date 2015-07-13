@@ -23,6 +23,7 @@ import com.wizturn.sdk.baseclass.IWizTurnController;
 import com.wizturn.sdk.entity.WizTurnBeacons;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,9 +37,8 @@ import java.util.TimerTask;
 public class WizTurnBeaconService extends Service {
 
     public WizTurnManager _wizturnMgr;
-    private Vibrator _vibrator;
 
-    private double minimum_distance = 1.0;
+    private double minimum_distance = 1.5;
     private String pre_awareness_beacon = "";
     private boolean isbinding = false;
     private int noti_id = 0;
@@ -50,10 +50,12 @@ public class WizTurnBeaconService extends Service {
     private SendMassgeHandler mMainHandler = new SendMassgeHandler();
 
     private static ArrayList<String> recog_beacons = new ArrayList<String>();
-    private int max_recong_beacons_num = 3;
+    private int max_recong_beacons_num = 1;
 
     private TimerTask mTask;
     private Timer mTimer;
+
+    Calendar calendar = Calendar.getInstance();
 
     // Binder given to clients
     private final IBinder mBinder = new WizTurnBeaconServiceBinder();
@@ -65,6 +67,7 @@ public class WizTurnBeaconService extends Service {
     }
     public interface ICallback {
         public void sendData(String data);
+        public void sendDbgData(String data);
     }
 
     public void registerCallback(ICallback wizturn_cb, ICallback rocon_cb) {
@@ -74,7 +77,7 @@ public class WizTurnBeaconService extends Service {
 
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("[WTSrv]", "onStartCommand()");
-        _vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        //_vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         wizturnMgr_setup();
         noti_setup();
         return START_STICKY;
@@ -139,7 +142,7 @@ public class WizTurnBeaconService extends Service {
     public void noti_setup(){
         notification_mgr = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         noti = new Notification(R.drawable.ic_launcher, "BeaconAwareness", System.currentTimeMillis());
-        noti.defaults = Notification.DEFAULT_SOUND;
+        //noti.defaults = Notification.DEFAULT_SOUND;
         noti.flags = Notification.FLAG_ONLY_ALERT_ONCE;
         noti.flags = Notification.FLAG_AUTO_CANCEL;
         Intent intent = new Intent(WizTurnBeaconService.this, BeaconAwarenessMainActivity.class);
@@ -170,6 +173,15 @@ public class WizTurnBeaconService extends Service {
         msg.what = 2;
         Bundle bundle = new Bundle();
         bundle.putString("sendData2UI", Data);
+        msg.setData(bundle);
+        mMainHandler.sendMessage(msg);
+    }
+
+    private void sendDbgData2UI (String Data){
+        Message msg = mMainHandler.obtainMessage();
+        msg.what = 3;
+        Bundle bundle = new Bundle();
+        bundle.putString("sendDbgData2UI", Data);
         msg.setData(bundle);
         mMainHandler.sendMessage(msg);
     }
@@ -237,6 +249,13 @@ public class WizTurnBeaconService extends Service {
         public void onGetDeviceList(IWizTurnController iWizTurnController, final List<WizTurnBeacons> device) {
             String strMac = "";
             String strScanResult = "";
+
+            String dbgData = "";
+            for (int i = 0; i < device.size(); i++) {
+                dbgData +=  "["+device.get(i).getMacAddress() + ": " + device.get(i).getDistance() + "m]";
+            }
+            sendDbgData2UI(dbgData);
+
             for (int i = 0; i < device.size(); i++) {
                 if (minimum_distance < device.get(i).getDistance()) {
                     continue;
@@ -255,7 +274,7 @@ public class WizTurnBeaconService extends Service {
                     mTimer = null;
                 }
                 mTimer = new Timer();
-                mTimer.schedule(new BeaconTimer(), 6000);
+                mTimer.schedule(new BeaconTimer(), 10000);
 
                 Log.i("[WTSrv]" ,strScanResult);
                 sendData2UI(strScanResult);
@@ -284,11 +303,15 @@ public class WizTurnBeaconService extends Service {
         }
     }
 
+
+    ArrayList<String> dbgDataList = new ArrayList<String>();
+    int nMaxDbgDataLength = 15;
     public class SendMassgeHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             String data = "";
+
             switch (msg.what) {
                 case 1:
                     data = msg.getData().getString("sendData2Rocon");
@@ -300,6 +323,17 @@ public class WizTurnBeaconService extends Service {
                     data = msg.getData().getString("sendData2UI");
                     if (mWizturnCallback != null && isbinding) {
                         mWizturnCallback.sendData(data);
+                    }
+                    break;
+                case 3:
+                    Calendar calendar = Calendar.getInstance();
+                    data = calendar.getTime().toString() + "-" + msg.getData().getString("sendDbgData2UI") + "\n";
+                    if(dbgDataList.size() > nMaxDbgDataLength){
+                        dbgDataList.remove(0);
+                    }
+                    dbgDataList.add(data);
+                    if (mWizturnCallback != null && isbinding) {
+                        mWizturnCallback.sendDbgData(dbgDataList.toString());
                     }
                     break;
                 default:
