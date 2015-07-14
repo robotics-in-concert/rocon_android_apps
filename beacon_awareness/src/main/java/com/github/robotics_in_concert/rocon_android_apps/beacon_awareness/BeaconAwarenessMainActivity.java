@@ -204,6 +204,8 @@ public class BeaconAwarenessMainActivity extends Activity implements View.OnClic
         if(rocon_connector.isConnectRocon) {
             disconnectRocon();
         }
+        Button btn = (Button)findViewById(R.id.rocon_srv_start);
+        btn.setVisibility(View.INVISIBLE);
     }
 
     @Override

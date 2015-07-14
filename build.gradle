@@ -18,14 +18,70 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'
 }
 
+//buildscript {
+//    apply from: "https://github.com/rosjava/android_core/raw/indigo/buildscript.gradle"
+//}
+
 buildscript {
-    apply from: "https://github.com/rosjava/android_core/raw/indigo/buildscript.gradle"
+    //apply from: "https://github.com/rosjava/android_core/raw/indigo/buildscript.gradle"
+    //apply from: "https://github.com/rosjava/rosjava_bootstrap/raw/indigo/buildscript.gradle"
+    String rosMavenPath = System.getenv("ROS_MAVEN_PATH")
+    String rosMavenRepository = System.getenv("ROS_MAVEN_REPOSITORY")
+    repositories {
+        if (rosMavenPath != null) {
+            rosMavenPath.tokenize(":").each { path ->
+                maven {
+                    // We can't use uri() here because we aren't running inside something
+                    // that implements the Script interface.
+                    url "file:${path}"
+                }
+            }
+        }
+        maven {
+            url "http://repository.springsource.com/maven/bundles/release"
+        }
+        maven {
+            url "http://repository.springsource.com/maven/bundles/external"
+        }
+        if (rosMavenRepository != null) {
+            maven {
+                url rosMavenRepository
+            }
+        }
+        //maven {
+        //    url "https://github.com/rosjava/rosjava_mvn_repo/raw/master"
+        //}
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.ros.rosjava_bootstrap:gradle_plugins:[0.2,0.3)"
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:1.0.+"
+    }
 }
 
 apply plugin: 'catkin'
 
 allprojects {
-    apply from: "https://github.com/talregev/rosjava_mvn_repo/raw/master/maven.gradle"
+
+    repositories {
+        mavenCentral()
+        maven {
+            url "http://central.maven.org/maven2/"
+        }
+        maven {
+            url "https://repo.jfrog.org/artifactory/libs-releases/"
+        }
+        maven {
+            url "https://repo.maven.apache.org/maven2/"
+        }
+        maven {
+            url "https://repo1.maven.org/maven2/"
+        }
+    }
+
     group 'com.github.robotics_in_concert.rocon_android_apps'
     version = project.catkin.pkg.version
 }
